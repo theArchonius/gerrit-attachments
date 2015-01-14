@@ -8,6 +8,10 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescr
 import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidAttachmentTargetException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidFileException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.RequestException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.ResponseException;
 
 /**
  * The base class for all services that add and delete file attachments or
@@ -23,12 +27,21 @@ public interface FileAttachmentClientService {
    *
    * @param file the file to attach
    * @param attachmentTargetDescription the target which gets the file attached
+   * @throws InvalidAttachmentTargetException if the attachment target is
+   *         invalid or not supported
+   * @throws InvalidFileException if the file is invalid or not supported
+   * @throws RequestException if an error occurs during the request to the
+   *         server
+   * @throws ResponseException if an error occurs during handling of the
+   *         response from the server
    * @throws FileAttachmentClientException
+   * 
+   * @return the result summary of the attachment operation
    */
-  public void attachFile(File file,
+  public OperationResult attachFile(File file,
       AttachmentTargetDescription attachmentTargetDescription)
-      throws FileAttachmentClientException; // TODO throw more meaningful
-                                            // exceptions here
+      throws FileAttachmentClientException, InvalidAttachmentTargetException,
+      InvalidFileException, RequestException, ResponseException;
 
   /**
    * creates a AttachmentTarget which can be used to get access to all of its
@@ -36,12 +49,15 @@ public interface FileAttachmentClientService {
    *
    * @param attachmentTargetDescription
    * @return a AttachmentTarget containing all information of the attached files
+   * @throws RequestException if an error occurs during the request to the
+   *         server
+   * @throws ResponseException if an error occurs during handling of the
+   *         response from the server
    * @throws FileAttachmentClientException
    */
   public AttachmentTarget getAttachmentTarget(
       AttachmentTargetDescription attachmentTargetDescription)
-      throws FileAttachmentClientException; // TODO throw more meaningful
-                                            // exceptions here
+      throws FileAttachmentClientException, RequestException, ResponseException;
 
   /**
    * retrieves an attached file
@@ -50,10 +66,15 @@ public interface FileAttachmentClientService {
    *        file
    * @param attachmentTarget the description of the attachment target used to
    *        identify the attached file
+   * @throws RequestException if an error occurs during the request to the
+   *         server
+   * @throws ResponseException if an error occurs during handling of the
+   *         response from the server
+   * @throws FileAttachmentClientException
    */
   public File getFile(FileDescription fileDescription,
       AttachmentTargetDescription attachmentTargetDescripton)
-      throws FileAttachmentClientException;
+      throws FileAttachmentClientException, RequestException, ResponseException;
 
   /**
    * deletes the given file from the attached file list
@@ -63,12 +84,17 @@ public interface FileAttachmentClientService {
    *        {@link #deleteFile(FileDescription, AttachmentTargetDescription)}
    *        instead or retrieve an {@link AttachmentTarget} using
    *        {@link #getAttachmentTarget(AttachmentTargetDescription)}.
+   * @return TODO
+   * @throws RequestException if an error occurs during the request to the
+   *         server
+   * @throws ResponseException if an error occurs during handling of the
+   *         response from the server
    * @throws FileAttachmentClientException
    * @throws {@link IllegalArgumentException} if the file has no attachment
    *         target assigned
    */
-  public void deleteFile(File file) throws FileAttachmentClientException,
-      IllegalArgumentException; // TODO throw more meaningful exceptions here
+  public OperationResult deleteFile(File file) throws FileAttachmentClientException,
+      IllegalArgumentException, RequestException, ResponseException;
 
   /**
    * deletes the given attached file from the attached file list
@@ -77,10 +103,14 @@ public interface FileAttachmentClientService {
    *        file to delete
    * @param attachmentTargetDescription the description of the attachment target
    *        used to identify the file to delete
+   * @return TODO
+   * @throws RequestException if an error occurs during the request to the
+   *         server
+   * @throws ResponseException if an error occurs during handling of the
+   *         response from the server
    * @throws FileAttachmentClientException
    */
-  public void deleteFile(FileDescription fileDescription,
+  public OperationResult deleteFile(FileDescription fileDescription,
       AttachmentTargetDescription attachmentTargetDescription)
-      throws FileAttachmentClientException; // TODO throw more meaningful
-                                            // exceptions here
+      throws FileAttachmentClientException, RequestException, ResponseException;
 }

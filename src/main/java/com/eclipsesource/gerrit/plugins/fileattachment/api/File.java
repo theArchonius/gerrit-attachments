@@ -27,4 +27,9 @@ public interface File {
    */
   public ContentType getContentType();
 
+  /**
+   * @return the content of the file
+   */
+  public Byte[] getContent();
+
 }

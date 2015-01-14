@@ -62,5 +62,10 @@ limitations under the License.
   		<artifactId>jersey-client</artifactId>
   		<version>2.14</version>
   	</dependency>
+  	<dependency>
+  		<groupId>com.google.code.gson</groupId>
+  		<artifactId>gson</artifactId>
+  		<version>2.3.1</version>
+  	</dependency>
   </dependencies>
 </project>
