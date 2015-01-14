@@ -21,11 +21,11 @@ Additionally you have to do check out the gerrit tree or use the gerrit bucklets
  2. Clone and checkout the desired version of this plugin into the *plugins* directory of the checked out gerrit tree
  3. Exclude your local plugin repository from your local gerrit repository 
 
-      echo /plugins/fileattachment >>.git/info/exclude 
+        echo /plugins/fileattachment >>.git/info/exclude 
 
  4. build the plugin using 
 
-      buck build //plugins/fileattachment:fileattachment 
+        buck build //plugins/fileattachment:fileattachment 
 
 The plugin jar file can be found afterwards in the `buck-out/gen/plugins/fileattachment` directory.
 
@@ -36,15 +36,15 @@ The plugin jar file can be found afterwards in the `buck-out/gen/plugins/fileatt
  1. Clone and checkout the desired version of this repository
  2. Clone and checkout the desired version of the Gerrit Bucklets into your previosuly created local repository
 
-       git clone https://gerrit.googlesource.com/bucklets
+        git clone https://gerrit.googlesource.com/bucklets
 
  3. Exclude your local bucklet repository from your local plugin repository 
 
-      echo /plugins/fileattachment >>.git/info/exclude 
+        echo /plugins/fileattachment >>.git/info/exclude 
       
  4. build the plugin using 
 
-      buck build :fileattachment 
+        buck build :fileattachment 
       
 The plugin jar file can be found afterwards in the `buck-out/gen/` directory.
 
