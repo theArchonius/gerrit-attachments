@@ -30,6 +30,6 @@ public interface File {
   /**
    * @return the content of the file
    */
-  public Byte[] getContent();
+  public byte[] getContent();
 
 }

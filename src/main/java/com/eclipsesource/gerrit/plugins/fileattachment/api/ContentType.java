@@ -27,7 +27,7 @@ public interface ContentType {
    *
    * @return a map of parameter and value pairs of this content type
    */
-  public Map<String, String> getParamters();
+  public Map<String, String> getParameters();
 
   /**
    *
