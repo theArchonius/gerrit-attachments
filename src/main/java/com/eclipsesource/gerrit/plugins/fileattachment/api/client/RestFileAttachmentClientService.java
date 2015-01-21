@@ -65,17 +65,18 @@ public class RestFileAttachmentClientService implements
    * the registry used to map {@link AttachmentTarget}s to {@link RestEndpoint}s
    */
   private AttachmentTargetRestEndpointRegistry restEndpointRegistry;
-  
+
   /**
-   * the client builder used to create new client instances used to access REST endpoints
+   * the client builder used to create new client instances used to access REST
+   * endpoints
    */
   private ClientBuilder clientBuilder;
-  
+
   /**
    * the user name used for authentication
    */
   private String username;
-  
+
   /**
    * the password used for authentication
    */
@@ -88,9 +89,22 @@ public class RestFileAttachmentClientService implements
    * @param restEndpointRegistry the registry used to map
    *        {@link AttachmentTarget}s to {@link RestEndpoint}s. Passing null is
    *        not permitted.
+   * @param operationResultReader the {@link OperationResult} reader that is
+   *        used to convert {@link FileModificationResponseEntity}s to
+   *        {@link OperationResult}s
+   * @param fileEntityWriter the {@link FileEntity} writer used to convert
+   *        {@link File}s to {@link FileEntity}s
+   * @param username the name of the user to authenticate with
+   * @param password the password of the user as byte array (do not store
+   *        passwords in {@link String}s for security reasons)
+   * 
    */
-  public RestFileAttachmentClientService(URI restRoot,
-      AttachmentTargetRestEndpointRegistry restEndpointRegistry, String username, byte[] password) {
+  public RestFileAttachmentClientService(
+      URI restRoot,
+      AttachmentTargetRestEndpointRegistry restEndpointRegistry,
+      EntityReader<OperationResult, FileModificationResponseEntity> operationResultReader,
+      EntityWriter<File, FileEntity> fileEntityWriter, String username,
+      byte[] password) {
 
     if (restRoot == null) {
       throw new IllegalArgumentException("A REST root URI must be specified");
@@ -105,7 +119,19 @@ public class RestFileAttachmentClientService implements
 
     this.username = username;
     this.password = password;
-    
+
+    if (operationResultReader == null) {
+      throw new IllegalArgumentException(
+          "An operation result reader must be specfied");
+    }
+    this.operationResultReader = operationResultReader;
+
+    if (fileEntityWriter == null) {
+      throw new IllegalArgumentException(
+          "A file entity wirter must be specfied");
+    }
+    this.fileEntityWriter = fileEntityWriter;
+
     this.clientBuilder = ClientBuilder.newBuilder();
     clientBuilder.register(EntityMessageBodyWriter.class);
     clientBuilder.register(EntityMessageBodyReader.class);
@@ -125,15 +151,16 @@ public class RestFileAttachmentClientService implements
       AttachmentTargetDescription attachmentTargetDescription)
       throws FileAttachmentClientException, InvalidAttachmentTargetException,
       InvalidFileException, RequestException, ResponseException {
-    
-    
+
+
     // create client
     Client client = clientBuilder.build();
-    
+
     // add digest authentication
-    HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.digest(username, password);
+    HttpAuthenticationFeature authFeature =
+        HttpAuthenticationFeature.digest(username, password);
     client.register(authFeature);
-    
+
     // create root target
     WebTarget rootTarget = client.target(restRoot);
 
