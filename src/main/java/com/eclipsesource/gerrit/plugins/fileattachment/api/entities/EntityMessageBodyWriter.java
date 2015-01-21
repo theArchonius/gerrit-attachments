@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -68,7 +69,13 @@ public class EntityMessageBodyWriter<T> implements MessageBodyWriter<T> {
             FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
     // Note: this naming policy is required by gerrit
     
-    entityStream.write(gson.toJson(t).getBytes(StandardCharsets.UTF_8));
+    Charset charset = Charset.defaultCharset();
+    Map<String, String> parameters = mediaType.getParameters();
+    if (parameters.containsKey("charset")) {
+      charset = Charset.forName(parameters.get("charset"));
+    }
+    
+    entityStream.write(gson.toJson(t).getBytes(charset));
   }
 
 }

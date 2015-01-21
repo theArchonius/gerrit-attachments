@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
@@ -60,7 +59,7 @@ public class EntityMessageBodyReader<T> implements MessageBodyReader<T> {
     // Note: this naming policy is required by gerrit
 
 
-    Charset charset = StandardCharsets.UTF_8;
+    Charset charset = Charset.defaultCharset();
     Map<String, String> parameters = mediaType.getParameters();
     if (parameters.containsKey("charset")) {
       charset = Charset.forName(parameters.get("charset"));
