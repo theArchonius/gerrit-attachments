@@ -5,6 +5,8 @@ package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
 
 import java.nio.charset.Charset;
 
+import org.apache.commons.codec.binary.Base64;
+
 import com.eclipsesource.gerrit.plugins.fileattachment.api.ContentType;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
@@ -28,18 +30,24 @@ public class BaseFileEntityWriter implements EntityWriter<File, FileEntity> {
     fileEntity.setFileName(fileDescription.getFileName());
     fileEntity.setFilePath(fileDescription.getFilePath());
 
-    fileEntity.setContentType(file.getContentType().getContentTypeIdentifier());
-
     ContentType contentType = file.getContentType();
+    fileEntity.setContentType(contentType.getContentTypeIdentifier());
 
     if (contentType.isBinary()) {
-      // TODO do some binary to text encoding
 
-      // fileEntity.setContent(content);
-      // fileEntity.setEncodingMethod(encodingMethod);
-      throw new UnsupportedOperationException(
-          "Binary files are currently not supported");
+      // encode the content as base64 as JSON does not support binary data (Gson
+      // supports it, but then we are bound to Gson forever - also there is
+      // currently no easy way to modify the Gson configuration through the
+      // Gerrit API )
+
+      String content = Base64.encodeBase64String(file.getContent());
+      fileEntity.setContent(content);
+      fileEntity.setEncodingMethod("base64");
+
     } else {
+
+      // obtain the text and write it directly into the the entity - we don't need to encode textual data
+
       /*
        * TODO refactor to avoid unnecessary conversions
        * 
