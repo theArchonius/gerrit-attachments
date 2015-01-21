@@ -4,7 +4,7 @@
 package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
 
 /**
- * Results types of file attachment operations
+ * Result types of file attachment operations
  * 
  * @author Florian Zoubek
  *
