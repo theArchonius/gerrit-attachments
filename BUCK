@@ -27,7 +27,7 @@ java_library(
   srcs = glob([
     'src/main/java/com/eclipsesource/gerrit/plugins/fileattachment/api/**/*.java',
   ]),
-  deps = [':jersey-client', ':gson', ':javax.ws.rs-api']
+  deps = [':jersey-client', ':gson', ':javax.ws.rs-api', ':commons-codec']
 )
 
 maven_jar(
@@ -53,4 +53,10 @@ maven_jar(
   name = 'javax.ws.rs-api',
   id = 'javax.ws.rs:javax.ws.rs-api:2.0.1',
   license = 'GPL2'
+)
+
+maven_jar(
+  name = 'commons-codec',
+  id = 'commons-codec:commons-codec:1.10',
+  license = 'Apache2.0'
 )
