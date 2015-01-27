@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter;
 
 import java.nio.charset.Charset;
 

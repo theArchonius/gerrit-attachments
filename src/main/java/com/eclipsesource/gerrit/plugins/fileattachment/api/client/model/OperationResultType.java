@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.client.model;
 
 /**
  * Result types of file attachment operations

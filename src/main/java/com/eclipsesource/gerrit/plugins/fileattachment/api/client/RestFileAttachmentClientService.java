@@ -27,6 +27,9 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.Inv
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidFileException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.RequestException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.ResponseException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.GenericOperationResult;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResult;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.RestEndpoint;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityMessageBodyReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityMessageBodyWriter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
@@ -195,7 +198,7 @@ public class RestFileAttachmentClientService implements
     if (response != null) {
 
       // handle response
-      result = SimpleOperationResult.getSuccessResult();
+      result = GenericOperationResult.getSuccessResult();
 
       if (response.hasEntity()) {
         try {

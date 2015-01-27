@@ -1,8 +1,11 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter;
 
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.GenericOperationResult;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResult;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResultType;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModificationResponseEntity;
 

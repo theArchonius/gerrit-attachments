@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.client.model;
 
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
