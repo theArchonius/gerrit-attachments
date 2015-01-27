@@ -34,7 +34,7 @@ public class GenericRestEndpoint implements RestEndpoint {
    * @throws FileAttachmentClientException if an Exception occurs during URL
    *         encoding
    */
-  public GenericRestEndpoint(String[] pathElements)
+  public GenericRestEndpoint(String... pathElements)
       throws FileAttachmentClientException {
     URLCodec urlCodec = new URLCodec();
     StringBuilder sb = new StringBuilder();

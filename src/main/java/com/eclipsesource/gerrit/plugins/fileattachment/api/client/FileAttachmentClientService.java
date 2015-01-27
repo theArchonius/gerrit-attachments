@@ -24,6 +24,31 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.Operatio
 public interface FileAttachmentClientService {
 
   /**
+   * identifier for the {@link #attachFile(File, AttachmentTargetDescription)}
+   * operation
+   */
+  public static final String OPERATION_ATTACH_FILE = "attachFile";
+
+  /**
+   * identifier for the
+   * {@link #getAttachmentTarget(AttachmentTargetDescription)} operation
+   */
+  public static final String OPERATION_GET_TARGET = "getTarget";
+
+  /**
+   * identifier for the
+   * {@link #getFile(FileDescription, AttachmentTargetDescription)} operation
+   */
+  public static final String OPERATION_GET_FILE = "getFile";
+
+  /**
+   * identifier for the {@link #deleteFile(File)} and
+   * {@link #deleteFile(FileDescription, AttachmentTargetDescription)}
+   * operations
+   */
+  public static final String OPERATION_DELETE_FILE = "deleteFile";
+
+  /**
    * attaches a file to the given target
    *
    * @param file the file to attach
@@ -94,8 +119,9 @@ public interface FileAttachmentClientService {
    * @throws {@link IllegalArgumentException} if the file has no attachment
    *         target assigned
    */
-  public OperationResult deleteFile(File file) throws FileAttachmentClientException,
-      IllegalArgumentException, RequestException, ResponseException;
+  public OperationResult deleteFile(File file)
+      throws FileAttachmentClientException, IllegalArgumentException,
+      RequestException, ResponseException;
 
   /**
    * deletes the given attached file from the attached file list

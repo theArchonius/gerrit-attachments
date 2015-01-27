@@ -46,7 +46,7 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModifica
  */
 public class RestFileAttachmentClientService implements
     FileAttachmentClientService {
-
+  
   /**
    * the root URI for all REST requests
    */
@@ -169,7 +169,7 @@ public class RestFileAttachmentClientService implements
 
     // obtain REST endpoint information
     RestEndpoint restEndpoint =
-        restEndpointRegistry.getRestEndpoint(attachmentTargetDescription);
+        restEndpointRegistry.getRestEndpoint(attachmentTargetDescription, FileAttachmentClientService.OPERATION_ATTACH_FILE );
     if (restEndpoint == null) {
       // no REST Endpoint found for the given target
       throw new InvalidAttachmentTargetException(attachmentTargetDescription,

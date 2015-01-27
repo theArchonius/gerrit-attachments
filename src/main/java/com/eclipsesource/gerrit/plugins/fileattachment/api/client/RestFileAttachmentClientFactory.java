@@ -7,7 +7,6 @@ import java.net.URI;
 
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter.BaseFileEntityWriter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter.BaseFileModificationResponseReader;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.DefaultRestEndpointRegistry;
 
 /**
  * Default implementation of the {@link FileAttachmentClientFactory}
