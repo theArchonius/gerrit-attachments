@@ -19,10 +19,10 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileEntity;
  * @author Florian Zoubek
  *
  */
-public class BaseFileEntityWriter implements EntityWriter<File, FileEntity> {
+public class BaseFileEntityWriter implements EntityWriter<File, FileEntity, Object> {
 
   @Override
-  public FileEntity toEntity(File file) {
+  public FileEntity toEntity(File file, Object context) {
 
     FileEntity fileEntity = new FileEntity();
 

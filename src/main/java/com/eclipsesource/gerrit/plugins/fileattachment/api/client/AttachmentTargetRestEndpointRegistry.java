@@ -23,7 +23,8 @@ public interface AttachmentTargetRestEndpointRegistry {
    * 
    * @param target
    * @param operation the operation identifier
-   * @return the rest endpoint for the given target
+   * @return the rest endpoint for the given target or null if the target is not
+   *         supported
    * @throws UnsupportedFileOperationException if the operation is not supported
    *         by this registry
    * @throws FileAttachmentClientException if an error occurs during endpoint
@@ -38,7 +39,8 @@ public interface AttachmentTargetRestEndpointRegistry {
    * 
    * @param target
    * @param operation the operation identifier
-   * @return the rest endpoint for the given target
+   * @return the rest endpoint for the given target or null if the target is not
+   *         supported
    * @throws UnsupportedFileOperationException if the operation is not supported
    *         by this registry
    * @throws FileAttachmentClientException if an error occurs during endpoint

@@ -36,6 +36,7 @@ public class UnsupportedFileOperationException extends
    */
   public UnsupportedFileOperationException(String operationIdentifier, Throwable cause){
     super(cause);
+    this.operationIdentifier = operationIdentifier;
   }
 
   /**
@@ -43,6 +44,7 @@ public class UnsupportedFileOperationException extends
    */
   public UnsupportedFileOperationException(String operationIdentifier, String message){
     super(message);
+    this.operationIdentifier = operationIdentifier;
   }
 
   /**
@@ -50,6 +52,7 @@ public class UnsupportedFileOperationException extends
    */
   public UnsupportedFileOperationException(String operationIdentifier, String message, Throwable cause){
     super(message, cause);
+    this.operationIdentifier = operationIdentifier;
   }
 
   /**

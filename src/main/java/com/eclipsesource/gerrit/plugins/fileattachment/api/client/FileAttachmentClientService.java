@@ -10,6 +10,7 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidAttachmentTargetException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidFileException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.OperationFailedException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.RequestException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.ResponseException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResult;
@@ -79,11 +80,13 @@ public interface FileAttachmentClientService {
    *         server
    * @throws ResponseException if an error occurs during handling of the
    *         response from the server
+   * @throws OperationFailedException if the operation failed on the server side
    * @throws FileAttachmentClientException
    */
   public AttachmentTarget getAttachmentTarget(
       AttachmentTargetDescription attachmentTargetDescription)
-      throws FileAttachmentClientException, RequestException, ResponseException;
+      throws FileAttachmentClientException, RequestException,
+      ResponseException, OperationFailedException;
 
   /**
    * retrieves an attached file
@@ -96,11 +99,13 @@ public interface FileAttachmentClientService {
    *         server
    * @throws ResponseException if an error occurs during handling of the
    *         response from the server
+   * @throws OperationFailedException if the operation failed on the server side
    * @throws FileAttachmentClientException
    */
   public File getFile(FileDescription fileDescription,
       AttachmentTargetDescription attachmentTargetDescripton)
-      throws FileAttachmentClientException, RequestException, ResponseException;
+      throws FileAttachmentClientException, RequestException,
+      ResponseException, OperationFailedException;
 
   /**
    * deletes the given file from the attached file list

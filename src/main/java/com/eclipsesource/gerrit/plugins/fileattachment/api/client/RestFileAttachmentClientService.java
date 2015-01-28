@@ -22,20 +22,28 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter.BaseOperationResultReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidAttachmentTargetException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidFileException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.OperationFailedException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.RequestException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.ResponseException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.UnsupportedFileOperationException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.GenericOperationResult;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResult;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResultType;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.RestEndpoint;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetEntity;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetResponseEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityMessageBodyReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityMessageBodyWriter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityWriter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModificationResponseEntity;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity.ResultStatus;
 
 /**
  * Implementation of the {@link FileAttachmentClientService} that uses REST
@@ -46,7 +54,7 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModifica
  */
 public class RestFileAttachmentClientService implements
     FileAttachmentClientService {
-  
+
   /**
    * the root URI for all REST requests
    */
@@ -56,13 +64,26 @@ public class RestFileAttachmentClientService implements
    * the entity writer used to convert {@link File} instances to
    * {@link FileEntity}s
    */
-  private EntityWriter<File, FileEntity> fileEntityWriter;
+  private EntityWriter<File, FileEntity, Object> fileEntityWriter;
 
   /**
    * the entity reader used to convert {@link FileModificationResponseEntity}
    * instances to {@link OperationResult}s
    */
-  private EntityReader<OperationResult, FileModificationResponseEntity> operationResultReader;
+  private EntityReader<OperationResult, FileModificationResponseEntity, Object> fileModificationResponseEntityReader;
+
+  /**
+   * the entity reader used to convert {@link AttachmentTargetResponseEntity}
+   * instances to {@link AttachmentTarget}s
+   */
+  private EntityReader<AttachmentTarget, AttachmentTargetResponseEntity, AttachmentTargetDescription> attachmentTargetResponseReader;
+
+  /**
+   * the entity reader used to convert {@link OperationResultEntity} instances
+   * to {@link OperationResult}s
+   */
+  private EntityReader<OperationResult, OperationResultEntity, Object> operationResultEntityReader =
+      new BaseOperationResultReader();
 
   /**
    * the registry used to map {@link AttachmentTarget}s to {@link RestEndpoint}s
@@ -95,6 +116,9 @@ public class RestFileAttachmentClientService implements
    * @param operationResultReader the {@link OperationResult} reader that is
    *        used to convert {@link FileModificationResponseEntity}s to
    *        {@link OperationResult}s
+   * @param attachmentTargetResultReader the entity reader used to convert
+   *        {@link AttachmentTargetEntity} instances to {@link AttachmentTarget}
+   *        s
    * @param fileEntityWriter the {@link FileEntity} writer used to convert
    *        {@link File}s to {@link FileEntity}s
    * @param username the name of the user to authenticate with
@@ -105,8 +129,9 @@ public class RestFileAttachmentClientService implements
   public RestFileAttachmentClientService(
       URI restRoot,
       AttachmentTargetRestEndpointRegistry restEndpointRegistry,
-      EntityReader<OperationResult, FileModificationResponseEntity> operationResultReader,
-      EntityWriter<File, FileEntity> fileEntityWriter, String username,
+      EntityReader<OperationResult, FileModificationResponseEntity, Object> operationResultReader,
+      EntityReader<AttachmentTarget, AttachmentTargetResponseEntity, AttachmentTargetDescription> attachmentTargetResultReader,
+      EntityWriter<File, FileEntity, Object> fileEntityWriter, String username,
       byte[] password) {
 
     if (restRoot == null) {
@@ -127,7 +152,7 @@ public class RestFileAttachmentClientService implements
       throw new IllegalArgumentException(
           "An operation result reader must be specfied");
     }
-    this.operationResultReader = operationResultReader;
+    this.fileModificationResponseEntityReader = operationResultReader;
 
     if (fileEntityWriter == null) {
       throw new IllegalArgumentException(
@@ -168,12 +193,26 @@ public class RestFileAttachmentClientService implements
     WebTarget rootTarget = client.target(restRoot);
 
     // obtain REST endpoint information
-    RestEndpoint restEndpoint =
-        restEndpointRegistry.getRestEndpoint(attachmentTargetDescription, FileAttachmentClientService.OPERATION_ATTACH_FILE );
+    RestEndpoint restEndpoint = null;
+    try {
+      restEndpoint =
+          restEndpointRegistry.getRestEndpoint(attachmentTargetDescription,
+              FileAttachmentClientService.OPERATION_ATTACH_FILE);
+    } catch (UnsupportedFileOperationException ufoEx) {
+      // no REST Endpoint found for the given operation
+      throw new InvalidAttachmentTargetException(
+          attachmentTargetDescription,
+          "Could not find a registered rest endpoint for this operation. "
+              + "The specified REST endpoint registry does not support the operation identified by "
+              + "FileAttachmentClientService.OPERATION_ATTACH_FILE");
+    }
     if (restEndpoint == null) {
       // no REST Endpoint found for the given target
-      throw new InvalidAttachmentTargetException(attachmentTargetDescription,
-          "Could not find a registered rest endpoint for the attachment target");
+      throw new InvalidAttachmentTargetException(
+          attachmentTargetDescription,
+          "Could not find a registered rest endpoint for the attachment target "
+              + "The specified REST endpoint registry does not support AttachmentTargetDescriptions of the type "
+              + attachmentTargetDescription.getClass().getCanonicalName());
     }
 
     // create request
@@ -182,7 +221,7 @@ public class RestFileAttachmentClientService implements
     try {
 
       Entity<FileEntity> fileEntity =
-          Entity.entity(fileEntityWriter.toEntity(file),
+          Entity.entity(fileEntityWriter.toEntity(file, null),
               MediaType.APPLICATION_JSON_TYPE
                   .withCharset(StandardCharsets.UTF_8.name()));
       response = attachmentWebTarget.request().put(fileEntity);
@@ -202,16 +241,32 @@ public class RestFileAttachmentClientService implements
 
       if (response.hasEntity()) {
         try {
-          result =
-              operationResultReader.toObject(response
-                  .readEntity(FileModificationResponseEntity.class));
+          FileModificationResponseEntity entity =
+              response.readEntity(FileModificationResponseEntity.class);
+          result = fileModificationResponseEntityReader.toObject(entity, null);
+
+          if (result == null) {
+            // the response reader was not able to create a proper attachment
+            // target
+            throw new ResponseException(
+                "Could not extract the operation result from the response using the specified entity reader.");
+          }
+
         } catch (ProcessingException pe) {
           throw new ResponseException(
               MessageFormat.format(
                   "Internal error: Could not find an entity reader for the class {0}",
                   FileModificationResponseEntity.class), pe);
         }
+      } else {
+        // no entity -> something weird must have happened on the server
+        throw new OperationFailedException(
+            new GenericOperationResult(
+                OperationResultType.UNKNOWN,
+                "The result of the operation is unknown due to an unexpected response by the server"),
+            "Unexpected server response: Server responded with empty response.");
       }
+
     } else {
       // this should never happen as the response cannot be null if no
       // exception occurs
@@ -233,8 +288,114 @@ public class RestFileAttachmentClientService implements
   public AttachmentTarget getAttachmentTarget(
       AttachmentTargetDescription attachmentTargetDescription)
       throws FileAttachmentClientException, RequestException, ResponseException {
-    // TODO Auto-generated method stub
-    return null;
+    // create client
+    Client client = clientBuilder.build();
+
+    // add digest authentication
+    HttpAuthenticationFeature authFeature =
+        HttpAuthenticationFeature.digest(username, password);
+    client.register(authFeature);
+
+    // create root target
+    WebTarget rootTarget = client.target(restRoot);
+
+    // obtain REST Endpoint information
+    RestEndpoint restEndpoint = null;
+
+    try {
+      restEndpoint =
+          restEndpointRegistry.getRestEndpoint(attachmentTargetDescription,
+              FileAttachmentClientService.OPERATION_GET_TARGET);
+    } catch (UnsupportedFileOperationException ufoEx) {
+      // no REST Endpoint found for the given operation
+      throw new InvalidAttachmentTargetException(
+          attachmentTargetDescription,
+          "Could not find a registered rest endpoint for this operation. "
+              + "The specified REST endpoint registry does not support the operation identified by "
+              + "FileAttachmentClientService.OPERATION_GET_TARGET");
+    }
+    if (restEndpoint == null) {
+      // no REST Endpoint found for the given target
+      throw new InvalidAttachmentTargetException(
+          attachmentTargetDescription,
+          "Could not find a registered rest endpoint for the attachment target. "
+              + "The specified REST endpoint registry does not support AttachmentTargetDescriptions of the type "
+              + attachmentTargetDescription.getClass().getCanonicalName());
+    }
+
+    // create request
+    WebTarget attachmentWebTarget = rootTarget.path(restEndpoint.getPath());
+    Response response = null;
+    try {
+      // start the request
+      response = attachmentWebTarget.request().get();
+    } catch (ProcessingException pe) {
+      throw new ResponseException(
+          "Internal error: An error occured during response processing.", pe);
+    }
+
+    AttachmentTarget result = null;
+    if (response != null) {
+
+      if (response.hasEntity()) {
+        try {
+
+          AttachmentTargetResponseEntity attachmentTargetResponseEntity =
+              response.readEntity(AttachmentTargetResponseEntity.class);
+
+          OperationResultEntity operationResultEntity =
+              attachmentTargetResponseEntity.getOperationResultEntity();
+
+          // check the operation result
+          if (operationResultEntity.getResultStatus() == ResultStatus.SUCCESS) {
+
+            // operation was successful, extract the data into our model
+            result =
+                attachmentTargetResponseReader
+                    .toObject(attachmentTargetResponseEntity,
+                        attachmentTargetDescription);
+            if (result == null) {
+              // the response reader was not able to create a proper attachment
+              // target
+              throw new ResponseException(
+                  "Could not extract the attachment target from the response. "
+                      + "The specified response entity reader does not support attachment "
+                      + "targets of the type \""
+                      + attachmentTargetResponseEntity
+                          .getAttachmentTargetEntity().getTargetType().name()
+                      + "\"");
+            }
+
+          } else {
+
+            // operation has failed on the server side
+            throw new OperationFailedException(
+                operationResultEntityReader.toObject(operationResultEntity,
+                    null), "Operation failed due to an server error.");
+          }
+
+        } catch (ProcessingException pe) {
+          throw new ResponseException(
+              MessageFormat.format(
+                  "Internal error: Could not find an entity reader for the class {0}",
+                  FileModificationResponseEntity.class), pe);
+        }
+      } else {
+        // no entity -> something weird must have happened on the server
+        throw new OperationFailedException(
+            new GenericOperationResult(
+                OperationResultType.UNKNOWN,
+                "The result of the operation is unknown due to an unexpected response by the server"),
+            "Unexpected server response: Server responded with empty response.");
+      }
+    } else {
+      // this should never happen as the response cannot be null if no
+      // exception occurs
+      throw new ResponseException(
+          "Internal error: Could not process get request, response was null");
+    }
+
+    return result;
   }
 
   /*

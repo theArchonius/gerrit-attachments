@@ -58,7 +58,6 @@ public class EntityMessageBodyReader<T> implements MessageBodyReader<T> {
             FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
     // Note: this naming policy is required by gerrit
 
-
     Charset charset = Charset.defaultCharset();
     Map<String, String> parameters = mediaType.getParameters();
     if (parameters.containsKey("charset")) {

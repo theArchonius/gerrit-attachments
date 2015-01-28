@@ -17,7 +17,8 @@ public interface OperationResult {
   public OperationResultType getResultType();
 
   /**
-   * the error message or an empty string if no errors occured
+   * the detailed status message containing additional information, warnings and
+   * errors, may be empty but not null
    */
-  public String getErrorMessage();
+  public String getStatusMessage();
 }

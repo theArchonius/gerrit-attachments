@@ -17,10 +17,11 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModifica
  *
  */
 public class BaseFileModificationResponseReader implements
-    EntityReader<OperationResult, FileModificationResponseEntity> {
+    EntityReader<OperationResult, FileModificationResponseEntity, Object> {
 
   @Override
-  public OperationResult toObject(FileModificationResponseEntity jsonEntity) {
+  public OperationResult toObject(FileModificationResponseEntity jsonEntity,
+      Object context) {
 
     String errorMessage = "";
     OperationResultType resultType = OperationResultType.FAILED;

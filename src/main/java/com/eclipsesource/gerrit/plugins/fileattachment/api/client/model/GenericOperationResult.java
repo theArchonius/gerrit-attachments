@@ -34,7 +34,7 @@ public class GenericOperationResult implements OperationResult{
   }
 
   @Override
-  public String getErrorMessage() {
+  public String getStatusMessage() {
     return errorMessage;
   }
 

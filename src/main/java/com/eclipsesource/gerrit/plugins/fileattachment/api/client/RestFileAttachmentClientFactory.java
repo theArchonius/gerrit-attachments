@@ -5,6 +5,7 @@ package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
 
 import java.net.URI;
 
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter.BaseAttachmentTargetResponseEntityReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter.BaseFileEntityWriter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter.BaseFileModificationResponseReader;
 
@@ -35,7 +36,8 @@ public class RestFileAttachmentClientFactory implements
         new RestFileAttachmentClientService(restRoot,
             new DefaultRestEndpointRegistry(),
             new BaseFileModificationResponseReader(),
-            new BaseFileEntityWriter(), username, password);
+            new BaseAttachmentTargetResponseEntityReader(), new BaseFileEntityWriter(),
+            username, password);
     return service;
   }
 

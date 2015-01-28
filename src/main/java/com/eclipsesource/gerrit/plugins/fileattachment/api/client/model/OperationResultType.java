@@ -21,5 +21,10 @@ public enum OperationResultType {
   /**
    * the operation was not permitted
    */
-  NOTPERMITTED
+  NOTPERMITTED,
+  /**
+   * the operation result is unknown (e.g if the server responded in an
+   * unexpected way)
+   */
+  UNKNOWN
 }
