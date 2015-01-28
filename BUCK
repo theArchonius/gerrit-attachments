@@ -3,7 +3,7 @@ include_defs('//bucklets/maven_jar.bucklet')
 
 gerrit_plugin(
   name = 'fileattachment',
-  srcs = glob(['src/main/java/**/*.java'], excludes=['src/main/java/com.eclipsesource/gerrit/plugins/fileattachment/api/client/**/*.java']),
+  srcs = glob(['src/main/java/**/*.java'], excludes=['src/main/java/com/eclipsesource/gerrit/plugins/fileattachment/api/client/**/*.java']),
   resources = glob(['src/main/**/*']),
   manifest_entries = [
     'Gerrit-PluginName: fileattachment',

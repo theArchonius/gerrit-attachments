@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.entities;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities;
 
 import java.io.IOException;
 import java.io.InputStream;

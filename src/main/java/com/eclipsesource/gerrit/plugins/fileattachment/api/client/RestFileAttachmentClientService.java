@@ -22,6 +22,8 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.EntityMessageBodyReader;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.EntityMessageBodyWriter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter.BaseOperationResultReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidAttachmentTargetException;
@@ -36,8 +38,6 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.Operatio
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.RestEndpoint;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetResponseEntity;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityMessageBodyReader;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityMessageBodyWriter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityWriter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileEntity;
