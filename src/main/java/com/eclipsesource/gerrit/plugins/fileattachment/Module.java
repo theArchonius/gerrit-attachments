@@ -19,6 +19,13 @@ import static com.google.gerrit.server.change.FileResource.FILE_KIND;
 import com.google.gerrit.extensions.registration.DynamicSet;
 import com.google.gerrit.extensions.restapi.RestApiModule;
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
+
+import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileEntity;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.converter.BaseFileEntityConverter;
 
 /**
  * A example module to test out the possibilities of the gerrit plugin API
@@ -29,8 +36,11 @@ import com.google.inject.AbstractModule;
 class Module extends AbstractModule {
   @Override
   protected void configure() {
-    DynamicSet.bind(binder(), FileAttachmentService.class).to(GitFileAttachmentService.class);
+    DynamicSet.bind(binder(), FileAttachmentService.class).to(
+        GitFileAttachmentService.class);
     bind(FileAttachmentService.class).to(GitFileAttachmentService.class);
+    bind(new TypeLiteral<EntityReader<File, FileEntity, AttachmentTarget>>() {})
+        .to(BaseFileEntityConverter.class);
     install(new RestApiModule() {
       @Override
       protected void configure() {

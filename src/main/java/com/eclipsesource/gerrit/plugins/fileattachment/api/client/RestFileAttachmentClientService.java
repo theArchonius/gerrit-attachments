@@ -22,9 +22,11 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.OperationResult;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.OperationResultType;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.RestEndpoint;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.EntityMessageBodyReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.EntityMessageBodyWriter;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter.BaseOperationResultReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidAttachmentTargetException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidFileException;
@@ -32,10 +34,6 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.Ope
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.RequestException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.ResponseException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.UnsupportedFileOperationException;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.GenericOperationResult;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResult;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResultType;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.RestEndpoint;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetResponseEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
@@ -44,6 +42,8 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModificationResponseEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity.ResultStatus;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.converter.BaseOperationResultReader;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.GenericOperationResult;
 
 /**
  * Implementation of the {@link FileAttachmentClientService} that uses REST
@@ -64,7 +64,7 @@ public class RestFileAttachmentClientService implements
    * the entity writer used to convert {@link File} instances to
    * {@link FileEntity}s
    */
-  private EntityWriter<File, FileEntity, Object> fileEntityWriter;
+  private EntityWriter<File, FileEntity, AttachmentTarget> fileEntityWriter;
 
   /**
    * the entity reader used to convert {@link FileModificationResponseEntity}
@@ -131,7 +131,7 @@ public class RestFileAttachmentClientService implements
       AttachmentTargetRestEndpointRegistry restEndpointRegistry,
       EntityReader<OperationResult, FileModificationResponseEntity, Object> operationResultReader,
       EntityReader<AttachmentTarget, AttachmentTargetResponseEntity, AttachmentTargetDescription> attachmentTargetResultReader,
-      EntityWriter<File, FileEntity, Object> fileEntityWriter, String username,
+      EntityWriter<File, FileEntity, AttachmentTarget> fileEntityWriter, String username,
       byte[] password) {
 
     if (restRoot == null) {

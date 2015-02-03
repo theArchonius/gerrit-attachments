@@ -3,7 +3,7 @@
  */
 package com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions;
 
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResult;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.OperationResult;
 
 /**
  * @author Florian Zoubek

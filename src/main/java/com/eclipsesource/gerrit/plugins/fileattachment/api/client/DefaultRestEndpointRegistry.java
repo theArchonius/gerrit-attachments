@@ -9,13 +9,12 @@ import java.util.Map;
 
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.RestEndpoint;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.UnsupportedFileOperationException;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.ChangeTargetDescription;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.GenericRestEndpoint;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.PatchSetTargetDescription;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.PatchTargetDescription;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.RestEndpoint;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.ChangeTargetDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.PatchSetTargetDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.PatchTargetDescription;
 
 /**
  * The default {@link AttachmentTargetRestEndpointRegistry} which currently

@@ -13,12 +13,14 @@ package com.eclipsesource.gerrit.plugins.fileattachment.api;
 public interface FileDescription {
 
   /**
-   * @return the file path of the attached file
+   * @return the file path of the attached file on the server, the path uses '/'
+   *         as separator for parts of the path and if the path is not empty,
+   *         the last character must be '/'
    */
-  public String getFilePath();
+  public String getServerFilePath();
 
   /**
-   * @return the file name of the attached file
+   * @return the file name of the attached file on the server
    */
-  public String getFileName();
+  public String getServerFileName();
 }

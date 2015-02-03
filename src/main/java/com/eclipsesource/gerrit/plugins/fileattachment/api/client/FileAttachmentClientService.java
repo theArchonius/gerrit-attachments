@@ -7,13 +7,13 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.OperationResult;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidAttachmentTargetException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.InvalidFileException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.OperationFailedException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.RequestException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.ResponseException;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResult;
 
 /**
  * The base class for all services that add and delete file attachments or

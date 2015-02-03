@@ -1,14 +1,14 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.entities.converter;
 
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.GenericOperationResult;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResult;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.OperationResultType;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.OperationResult;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.OperationResultType;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity.ResultStatus;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.GenericOperationResult;
 
 /**
  * An entity reader which creates {@link OperationResult}s from

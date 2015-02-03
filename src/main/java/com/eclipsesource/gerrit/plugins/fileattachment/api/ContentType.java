@@ -29,6 +29,7 @@ public interface ContentType {
    */
   public Map<String, String> getParameters();
 
+  // TODO remove binary property and add type and subtype properties instead
   /**
    *
    * @return true if the media type describes a binary encoded media, false if the media format is text encoded media

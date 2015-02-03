@@ -5,9 +5,9 @@ package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
 
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.RestEndpoint;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.UnsupportedFileOperationException;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.RestEndpoint;
 
 /**
  * Represents a registry that maps {@link AttachmentTarget}s to

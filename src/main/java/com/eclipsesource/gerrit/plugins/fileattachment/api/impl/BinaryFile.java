@@ -1,9 +1,7 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client.model;
-
-import java.nio.charset.Charset;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.impl;
 
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.ContentType;
@@ -11,12 +9,12 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
 
 /**
- * Represents a simple text file
+ * Represents a simple file with arbitrary content
  * 
  * @author Florian Zoubek
  *
  */
-public class TextFile implements File {
+public class BinaryFile implements File {
 
   /**
    * the target which has this file attached, <code>null</code> if this file is
@@ -37,37 +35,35 @@ public class TextFile implements File {
   /**
    * the content
    */
-  private String content;
+  private byte[] content;
 
   /**
    * 
    * @param fileDescription the file description, must not be null
    * @param contentType the content type, must not be null
-   * @param content the content (encoded with the charset specified in the
-   *        content type - if none is specified, the default system charset is assumed)
+   * @param content the raw content
    * 
    * @throws IllegalArgumentException if the previously mentioned conditions are
    *         not met
    */
-  public TextFile(FileDescription fileDescription, ContentType contentType,
-      String content) {
+  public BinaryFile(FileDescription fileDescription, ContentType contentType,
+      byte[] content) {
     this(fileDescription, contentType, content, null);
   }
-  
+
   /**
    * 
    * @param fileDescription the file description, must not be null
    * @param contentType the content type, must not be null
-   * @param content the content (encoded with the charset specified in the
-   *        content type - if none is specified UTF8 is assumed)
+   * @param content the raw content
    * @param attachmentTarget the attachment target this file is attached to,
    *        null otherwise
    * 
    * @throws IllegalArgumentException if the previously mentioned conditions are
    *         not met
    */
-  public TextFile(FileDescription fileDescription, ContentType contentType,
-      String content, AttachmentTarget attachmentTarget) {
+  public BinaryFile(FileDescription fileDescription, ContentType contentType,
+      byte[] content, AttachmentTarget attachmentTarget) {
 
     if (fileDescription == null) {
       throw new IllegalArgumentException(
@@ -96,24 +92,12 @@ public class TextFile implements File {
 
   @Override
   public ContentType getContentType() {
-    return getContentType();
+    return contentType;
   }
 
   @Override
   public byte[] getContent() {
-    Charset charset = Charset.defaultCharset();
-
-    // search for specific charset in the content type, if there exists none,
-    // use the system default charset
-
-    if (contentType != null) {
-      String sCharset = contentType.getParameters().get("charset");
-      if (sCharset != null) {
-        charset = Charset.forName(sCharset);
-      }
-    }
-
-    return content.getBytes(charset);
+    return content;
   }
 
 }

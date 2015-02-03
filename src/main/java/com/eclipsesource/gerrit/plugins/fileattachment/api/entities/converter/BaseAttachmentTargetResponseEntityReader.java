@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client.entities.converter;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.entities.converter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +9,14 @@ import java.util.List;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.GenericFileDescription;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.PatchTarget;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.client.model.PatchTargetDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetEntity.TargetType;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetResponseEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileDescriptionEntity;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.GenericFileDescription;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.PatchTarget;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.PatchTargetDescription;
 
 /**
  * An entity reader which creates {@link AttachmentTarget}s from

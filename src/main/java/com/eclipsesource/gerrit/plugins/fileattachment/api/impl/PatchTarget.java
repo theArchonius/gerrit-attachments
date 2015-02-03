@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client.model;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.impl;
 
 import java.util.List;
 
