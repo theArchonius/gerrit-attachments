@@ -9,6 +9,7 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityConverter;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileEntity;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.BinaryFile;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.GenericContentType;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.GenericFileDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.TextFile;
@@ -105,9 +106,9 @@ public class BaseFileEntityConverter implements
 
     // TODO replace by decision based on the type, not on the binary property
     if(contentType.isBinary()){
-      // TODO implement
+      file = new BinaryFile(fileDescription, contentType, content, context);
     }else{
-      file = new TextFile(fileDescription, contentType, sContent, null);
+      file = new TextFile(fileDescription, contentType, sContent, context);
     }
     return file;
   }
