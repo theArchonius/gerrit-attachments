@@ -15,6 +15,9 @@ import com.google.gerrit.server.git.GitRepositoryManager;
 import com.google.gwtorm.server.OrmException;
 import com.google.inject.Inject;
 
+import com.eclipsesource.gerrit.plugins.fileattachment.api.File;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.FileDescription;
+
 import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.dircache.DirCache;
@@ -183,11 +186,11 @@ public class GitFileAttachmentService implements FileAttachmentService {
         commitBuilder.setCommitter(personIdent);
         commitBuilder.setAuthor(personIdent);
         commitBuilder
-        .setMessage(MessageFormat
-            .format(
-                "Attached file \"{0}\" to patch \"{1}\" from patch set {2}, change {3}",
-                repoFilePath, patchKey.get(), patchSetId.get(),
-                changeId.get()));
+            .setMessage(MessageFormat
+                .format(
+                    "Attached file \"{0}\" to patch \"{1}\" from patch set {2}, change {3}",
+                    repoFilePath, patchKey.get(), patchSetId.get(),
+                    changeId.get()));
 
         if (attachmentref != null) {
           commitBuilder.setParentId(attachmentref.getObjectId());
@@ -249,6 +252,168 @@ public class GitFileAttachmentService implements FileAttachmentService {
     } catch (ResourceNotFoundException | OrmException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
+    }
+  }
+
+
+
+  @Override
+  public void attachFile(File file, Key patchKey, IdentifiedUser user)
+      throws FileAttachmentException {
+
+    // extract base file properties from the given file
+    FileDescription fileDescription = file.getFileDescription();
+    String repoFileURI =
+        toRepoFilePath(fileDescription.getServerFilePath()
+            + fileDescription.getServerFileName());
+
+    // get the ids of the attachment target
+    PatchSet.Id patchSetId = patchKey.getParentKey();
+    Change.Id changeId = patchSetId.getParentKey();
+    ChangeResource changeResource = null;
+
+    FileIndex fileIndex = new FileIndex();
+
+    try {
+      // retrieve the the resource for the change
+      changeResource = changes.parse(changeId);
+
+      // we need the name of the Project to identify the correct repository
+      Project.NameKey projectName = changeResource.getChange().getProject();
+      Repository repository = null;
+      ObjectInserter inserter = null;
+
+      try {
+        repository = gitRepoManager.openRepository(projectName);
+        inserter = repository.newObjectInserter();
+
+        String refName = toRefName(changeId, patchSetId);
+
+        Ref attachmentref = repository.getRef(refName);
+
+        // We're working on a bare respository here, so create a temporary index
+        // to build the tree for the commit afterwards
+        DirCache index = DirCache.newInCore();
+        DirCacheBuilder dirCacheBuilder = index.builder();
+
+        if (attachmentref != null) {
+          // The ref already exists so we have to copy the previous RevTree to
+          // keep all already attached files
+
+          log.fine("Ref exists - copying tree to maintain old attachments");
+
+          RevWalk revWalk = new RevWalk(repository);
+          RevCommit prevCommit =
+              revWalk.parseCommit(attachmentref.getObjectId());
+          RevTree tree = prevCommit.getTree();
+
+          List<String> ignoredFiles = new ArrayList<>();
+          // add file path of the new file to the ignored file paths, as we
+          // don't want any already existing old file in our new tree
+          ignoredFiles.add(repoFileURI);
+          buildDirCacheFromTree(tree, repository, dirCacheBuilder,
+              ignoredFiles, fileIndex);
+
+          log.fine("finished copying tree");
+        }
+
+        // insert file as object
+        byte[] content = file.getContent();
+        long length = content.length;
+        InputStream inputStream = new ByteArrayInputStream(content);
+        ObjectId objectId =
+            inserter.insert(Constants.OBJ_BLOB, length, inputStream);
+        inputStream.close();
+
+        // create tree entry
+        DirCacheEntry entry = new DirCacheEntry(repoFileURI);
+        entry.setFileMode(FileMode.REGULAR_FILE);
+        entry.setLastModified(System.currentTimeMillis());
+        entry.setLength(length);
+        entry.setObjectId(objectId);
+        dirCacheBuilder.add(entry);
+
+        fileIndex.addEntry(patchKey.get(), repoFileURI);
+
+        // insert index file to associate files to patches
+        writeFileIndex(fileIndex, inserter, dirCacheBuilder);
+
+        dirCacheBuilder.finish();
+
+        // write new tree in database
+        ObjectId indexTreeId = index.writeTree(inserter);
+
+        // create commit
+        CommitBuilder commitBuilder = new CommitBuilder();
+        PersonIdent personIdent =
+            user.newCommitterIdent(new Date(), TimeZone.getDefault());
+        commitBuilder.setCommitter(personIdent);
+        commitBuilder.setAuthor(personIdent);
+        commitBuilder
+            .setMessage(MessageFormat
+                .format(
+                    "Attached file \"{0}\" to patch \"{1}\" from patch set {2}, change {3}",
+                    repoFileURI, patchKey.get(), patchSetId.get(),
+                    changeId.get()));
+
+        if (attachmentref != null) {
+          commitBuilder.setParentId(attachmentref.getObjectId());
+        }
+        commitBuilder.setTreeId(indexTreeId);
+
+        // commit
+        ObjectId commitId = inserter.insert(commitBuilder);
+        inserter.flush();
+
+        RefUpdate refUpdate = repository.updateRef(refName);
+        refUpdate.setNewObjectId(commitId);
+        if (attachmentref != null)
+          refUpdate.setExpectedOldObjectId(attachmentref.getObjectId());
+        else
+          refUpdate.setExpectedOldObjectId(ObjectId.zeroId());
+
+        // TODO
+        // the result handling below is copied from the CommitCommand class, I
+        // don't know if this is really necessary in our case
+        Result result = refUpdate.forceUpdate();
+        switch (result) {
+          case NEW:
+          case FORCED:
+          case FAST_FORWARD: {
+            if (repository.getRepositoryState() == RepositoryState.MERGING_RESOLVED) {
+              // Commit was successful. Now delete the files
+              // used for merge commits
+              repository.writeMergeCommitMsg(null);
+              repository.writeMergeHeads(null);
+            } else if (repository.getRepositoryState() == RepositoryState.CHERRY_PICKING_RESOLVED) {
+              repository.writeMergeCommitMsg(null);
+              repository.writeCherryPickHead(null);
+            } else if (repository.getRepositoryState() == RepositoryState.REVERTING_RESOLVED) {
+              repository.writeMergeCommitMsg(null);
+              repository.writeRevertHead(null);
+            }
+            break;
+          }
+          case REJECTED:
+          case LOCK_FAILURE:
+            throw new FileAttachmentException(new ConcurrentRefUpdateException(
+                "Could not lock ref " + refUpdate.getRef().getName(),
+                refUpdate.getRef(), result));
+          default:
+            throw new FileAttachmentException(new JGitInternalException(
+                MessageFormat.format(JGitText.get().updatingRefFailed,
+                    refUpdate.getRef().getName(), commitId.toString(), result)));
+        }
+
+      } catch (IOException e) {
+        throw new FileAttachmentException(e);
+      } finally {
+        if (repository != null) repository.close();
+        if (inserter != null) inserter.release();
+      }
+
+    } catch (ResourceNotFoundException | OrmException e) {
+      throw new FileAttachmentException(e);
     }
   }
 

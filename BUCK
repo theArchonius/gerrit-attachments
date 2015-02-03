@@ -13,6 +13,7 @@ gerrit_plugin(
     'Gerrit-SshModule: com.eclipsesource.gerrit.plugins.fileattachment.SshModule',
     'Gerrit-HttpModule: com.eclipsesource.gerrit.plugins.fileattachment.HttpModule',
   ],
+  deps = ['//lib/commons:codec'],
 )
 
 # this is required for bucklets/tools/eclipse/project.py to work

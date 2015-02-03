@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.eclipsesource.gerrit.plugins.fileattachment.api.entities;
 
@@ -9,7 +9,7 @@ package com.eclipsesource.gerrit.plugins.fileattachment.api.entities;
  */
 public class FileModificationResponseEntity implements JsonEntity {
 
-  enum FileState {
+  public enum FileState {
     /**
      * the file has been attached and no previous version exists
      */

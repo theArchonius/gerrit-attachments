@@ -1,9 +1,10 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client.model;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.impl;
 
 import com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription;
+
 
 /**
  * The {@link AttachmentTargetDescription} for a PatchSet.

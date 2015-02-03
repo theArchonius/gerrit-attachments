@@ -1,11 +1,12 @@
 /**
  * 
  */
-package com.eclipsesource.gerrit.plugins.fileattachment.api.client.model;
+package com.eclipsesource.gerrit.plugins.fileattachment.api.client;
 
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
 
+import com.eclipsesource.gerrit.plugins.fileattachment.api.RestEndpoint;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.FileAttachmentClientException;
 
 /**
