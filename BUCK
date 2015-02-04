@@ -38,6 +38,7 @@ java_test(
   srcs = glob([
     'src/test/java/com/eclipsesource/gerrit/plugins/fileattachment/api/test/**/*Test.java',
   ]),
+  resources = glob(['src/test/resources/**/*']),
   deps = [':api', ':junit', ':hamcrest']
 )
 
