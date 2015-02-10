@@ -192,22 +192,27 @@ public class GenericContentType implements ContentType {
   public GenericContentType(String contentTypeIdentifier, boolean binary) {
 
     // extract the type, subtype and parameter strings
-    Pattern basePattern = Pattern.compile("(.*)/(.*);?(.*)");
-    Matcher basePatternMatcher = basePattern.matcher(contentTypeIdentifier);
-
-    if (!basePatternMatcher.matches()) {
+    int typeDelimiterPos = contentTypeIdentifier.indexOf('/');
+    if(typeDelimiterPos < 0){
       throw new IllegalArgumentException(
           MessageFormat
               .format(
-                  "Could not parse content type value - the content type value is invalid {0}",
+                  "Could not parse content type value - could not find type delimiter \"/\" in identifier \"{0}\"",
                   contentTypeIdentifier));
     }
 
-    type = basePatternMatcher.group(1);
-    subtype = basePatternMatcher.group(2);
-    String parameterString = basePatternMatcher.group(3);
+    type = contentTypeIdentifier.substring(0, typeDelimiterPos);    
+    subtype = contentTypeIdentifier.substring(typeDelimiterPos+1);
+    
+    int parameterDelimiterPos = subtype.indexOf(';');
+    if(parameterDelimiterPos >= 0 ){
+      String parameterString = subtype.substring(parameterDelimiterPos+1);
+      subtype = subtype.substring(0, parameterDelimiterPos);
 
-    parseParameters(parameterString, this.parameters);
+      parseParameters(parameterString, this.parameters);
+    }
+    
+    
     this.binary = binary;
 
   }
@@ -254,6 +259,11 @@ public class GenericContentType implements ContentType {
       } else if (currentChar == '"') {
         // we pass an quotation mark, update state accordingly
         isQuoted = !isQuoted;
+        if(isParam){
+          sbName.append(currentChar);
+        }else{
+          sbValue.append(currentChar);
+        }
 
       } else if (isParam) {
         // character is part of the parameter name
