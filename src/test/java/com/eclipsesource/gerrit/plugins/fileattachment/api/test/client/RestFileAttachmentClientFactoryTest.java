@@ -26,7 +26,7 @@ public class RestFileAttachmentClientFactoryTest {
     
     Assert.assertThat(new RestFileAttachmentClientFactory()
         .createFileAttachmentClientService(), CoreMatchers
-        .instanceOf(RestFileAttachmentClientService.class));
+        .instanceOf(RestFileAttachmentClientServiceTest.class));
   }
 
 }

@@ -11,7 +11,7 @@ import org.junit.Test;
  * @author Florian Zoubek
  *
  */
-public class RestFileAttachmentClientService {
+public class RestFileAttachmentClientServiceTest {
 
   /**
    * Test method for
