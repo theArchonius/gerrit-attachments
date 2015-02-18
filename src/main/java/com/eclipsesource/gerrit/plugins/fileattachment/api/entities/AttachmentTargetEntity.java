@@ -3,6 +3,8 @@
  */
 package com.eclipsesource.gerrit.plugins.fileattachment.api.entities;
 
+import java.util.Arrays;
+
 /**
  * Represents a JSON entity used to pass all information of a attachment target
  * between client & server.
@@ -88,6 +90,46 @@ public class AttachmentTargetEntity implements JsonEntity {
    */
   public void setFileDescriptions(FileDescriptionEntity[] fileDescriptions) {
     this.fileDescriptions = fileDescriptions;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(fileDescriptions);
+    result =
+        prime * result + ((targetType == null) ? 0 : targetType.hashCode());
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    AttachmentTargetEntity other = (AttachmentTargetEntity) obj;
+    if (!Arrays.equals(fileDescriptions, other.fileDescriptions)) return false;
+    if (targetType != other.targetType) return false;
+    return true;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "AttachmentTargetEntity [targetType=" + targetType
+        + ", fileDescriptions=" + Arrays.toString(fileDescriptions) + "]";
   }
 
 }

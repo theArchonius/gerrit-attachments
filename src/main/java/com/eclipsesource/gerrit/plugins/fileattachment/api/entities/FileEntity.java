@@ -119,4 +119,65 @@ public class FileEntity implements JsonEntity {
     this.encodingMethod = encodingMethod;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((content == null) ? 0 : content.hashCode());
+    result =
+        prime * result + ((contentType == null) ? 0 : contentType.hashCode());
+    result =
+        prime * result
+            + ((encodingMethod == null) ? 0 : encodingMethod.hashCode());
+    result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+    result = prime * result + ((filePath == null) ? 0 : filePath.hashCode());
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    FileEntity other = (FileEntity) obj;
+    if (content == null) {
+      if (other.content != null) return false;
+    } else if (!content.equals(other.content)) return false;
+    if (contentType == null) {
+      if (other.contentType != null) return false;
+    } else if (!contentType.equals(other.contentType)) return false;
+    if (encodingMethod == null) {
+      if (other.encodingMethod != null) return false;
+    } else if (!encodingMethod.equals(other.encodingMethod)) return false;
+    if (fileName == null) {
+      if (other.fileName != null) return false;
+    } else if (!fileName.equals(other.fileName)) return false;
+    if (filePath == null) {
+      if (other.filePath != null) return false;
+    } else if (!filePath.equals(other.filePath)) return false;
+    return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "FileEntity [fileName=" + fileName + ", filePath=" + filePath
+        + ", contentType=" + contentType + ", content=" + content
+        + ", encodingMethod=" + encodingMethod + "]";
+  }
+
 }
