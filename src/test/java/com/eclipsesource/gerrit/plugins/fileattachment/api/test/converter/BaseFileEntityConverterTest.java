@@ -3,15 +3,12 @@
  */
 package com.eclipsesource.gerrit.plugins.fileattachment.api.test.converter;
 
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -61,7 +58,7 @@ public class BaseFileEntityConverterTest {
   /**
    * the base content type of the entries in {@link #TEST_TEXT_RESOURCES}
    */
-  private static final String[] TEST_TEXT_RESOURCES_TYPES = {"txt"};
+  private static final String[] TEST_TEXT_RESOURCES_TYPES = {"text"};
 
   /**
    * the content subtype of the entries in {@link #TEST_TEXT_RESOURCES}
@@ -239,7 +236,7 @@ public class BaseFileEntityConverterTest {
             new GenericContentType(TEST_TEXT_RESOURCES_TYPES[i],
                 TEST_TEXT_RESOURCES_SUBTYPES[i], parameters);
 
-        File file = new TextFile(fileDescription, contentType, "");
+        File file = new TextFile(fileDescription, contentType, content);
 
         AttachmentTarget attachmentTarget =
             new PatchTarget(new PatchTargetDescription(
@@ -251,7 +248,7 @@ public class BaseFileEntityConverterTest {
 
         FileEntity expectedEntity =
             new FileEntity(fileName, filePath,
-                contentType.getContentTypeIdentifier(), content, "none");
+                contentType.getContentTypeIdentifier(), content, "None");
 
         // test conversion
         FileEntity fileEntity =
@@ -288,7 +285,7 @@ public class BaseFileEntityConverterTest {
 
       ContentType contentType =
           new GenericContentType(TEST_BINARY_RESOURCES_TYPES[i],
-              TEST_BINARY_RESOURCES_TYPES[i], parameters);
+              TEST_BINARY_RESOURCES_SUBTYPES[i], parameters);
 
       File file = new BinaryFile(fileDescription, contentType, content);
 
@@ -357,7 +354,9 @@ public class BaseFileEntityConverterTest {
                 contentType.getContentTypeIdentifier(), content, "none");
 
         // build expected file
-        File expectedFile = new TextFile(fileDescription, contentType, "");
+        File expectedFile =
+            new TextFile(fileDescription, contentType, content,
+                attachmentTarget);
 
 
         // test conversion
@@ -395,7 +394,7 @@ public class BaseFileEntityConverterTest {
 
       ContentType contentType =
           new GenericContentType(TEST_BINARY_RESOURCES_TYPES[i],
-              TEST_BINARY_RESOURCES_TYPES[i], parameters);
+              TEST_BINARY_RESOURCES_SUBTYPES[i], parameters);
 
 
       AttachmentTarget attachmentTarget =
@@ -411,7 +410,9 @@ public class BaseFileEntityConverterTest {
               Base64.encodeBase64String(content), "base64");
 
       // build expected file
-      File expectedFile = new BinaryFile(fileDescription, contentType, content);
+      File expectedFile =
+          new BinaryFile(fileDescription, contentType, content,
+              attachmentTarget);
 
 
       // test conversion

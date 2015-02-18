@@ -176,7 +176,7 @@ public class GenericContentType implements ContentType {
    *        value
    */
   public GenericContentType(String contentTypeIdentifier) {
-    this(contentTypeIdentifier, !contentTypeIdentifier.startsWith("txt"));
+    this(contentTypeIdentifier, !contentTypeIdentifier.trim().startsWith("text"));
   }
 
   /**
@@ -277,7 +277,7 @@ public class GenericContentType implements ContentType {
     // the last parameter value does not need to be marked with a special
     // character, so add the last parameter name and value if it exists
     if (sbName.length() > 0) {
-      map.put(sbName.toString(), sbValue.toString());
+      map.put(sbName.toString().trim(), sbValue.toString().trim());
     }
   }
 
