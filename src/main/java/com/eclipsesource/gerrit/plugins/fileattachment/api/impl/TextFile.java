@@ -116,4 +116,57 @@ public class TextFile implements File {
     return content.getBytes(charset);
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result =
+        prime * result
+            + ((attachmentTarget == null) ? 0 : attachmentTarget.hashCode());
+    result = prime * result + ((content == null) ? 0 : content.hashCode());
+    result =
+        prime * result + ((contentType == null) ? 0 : contentType.hashCode());
+    result =
+        prime * result
+            + ((fileDescription == null) ? 0 : fileDescription.hashCode());
+    return result;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    TextFile other = (TextFile) obj;
+    if (attachmentTarget == null) {
+      if (other.attachmentTarget != null) return false;
+    } else if (!attachmentTarget.equals(other.attachmentTarget)) return false;
+    if (content == null) {
+      if (other.content != null) return false;
+    } else if (!content.equals(other.content)) return false;
+    if (contentType == null) {
+      if (other.contentType != null) return false;
+    } else if (!contentType.equals(other.contentType)) return false;
+    if (fileDescription == null) {
+      if (other.fileDescription != null) return false;
+    } else if (!fileDescription.equals(other.fileDescription)) return false;
+    return true;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "TextFile [attachmentTarget=" + attachmentTarget
+        + ", fileDescription=" + fileDescription + ", contentType="
+        + contentType + ", content=" + content + "]";
+  }
+
 }

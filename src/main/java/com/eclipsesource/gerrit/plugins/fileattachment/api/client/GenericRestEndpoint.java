@@ -57,4 +57,44 @@ public class GenericRestEndpoint implements RestEndpoint {
     return path;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((path == null) ? 0 : path.hashCode());
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    GenericRestEndpoint other = (GenericRestEndpoint) obj;
+    if (path == null) {
+      if (other.path != null) return false;
+    } else if (!path.equals(other.path)) return false;
+    return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "GenericRestEndpoint [path=" + path + "]";
+  }
+
 }
