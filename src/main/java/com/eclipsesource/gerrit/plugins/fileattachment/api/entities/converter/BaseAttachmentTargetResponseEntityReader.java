@@ -14,6 +14,7 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTa
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetResponseEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileDescriptionEntity;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity.ResultStatus;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.GenericFileDescription;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.PatchTarget;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.PatchTargetDescription;
@@ -36,34 +37,36 @@ public class BaseAttachmentTargetResponseEntityReader
     AttachmentTargetEntity attachmentTargetEntity =
         jsonEntity.getAttachmentTargetEntity();
 
-    if (attachmentTargetEntity.getTargetType() == TargetType.PATCH) {
+    if (jsonEntity.getOperationResultEntity().getResultStatus() == ResultStatus.SUCCESS) {
+      if (attachmentTargetEntity.getTargetType() == TargetType.PATCH) {
 
-      // check if the attachment target description in the context matches the
-      // type
+        // check if the attachment target description in the context matches the
+        // type
 
-      if (!(context instanceof PatchTargetDescription)) {
-        // invalid target description
-        return null;
+        if (!(context instanceof PatchTargetDescription)) {
+          // invalid target description
+          return null;
+        }
+
+        PatchTargetDescription patchTargetDescription =
+            (PatchTargetDescription) context;
+
+        // convert file description entities to file descriptions
+
+        FileDescriptionEntity[] fileDescriptionEntities =
+            attachmentTargetEntity.getFileDescriptions();
+        List<FileDescription> attachedFileDescriptions =
+            new ArrayList<FileDescription>(fileDescriptionEntities.length);
+
+        for (FileDescriptionEntity fileDescriptionEntity : fileDescriptionEntities) {
+          attachedFileDescriptions.add(new GenericFileDescription(
+              fileDescriptionEntity.getFilePath(), fileDescriptionEntity
+                  .getFileName()));
+        }
+
+        return new PatchTarget(patchTargetDescription, attachedFileDescriptions);
+
       }
-
-      PatchTargetDescription patchTargetDescription =
-          (PatchTargetDescription) context;
-
-      // convert file description entities to file descriptions
-
-      FileDescriptionEntity[] fileDescriptionEntities =
-          attachmentTargetEntity.getFileDescriptions();
-      List<FileDescription> attachedFileDescriptions =
-          new ArrayList<FileDescription>(fileDescriptionEntities.length);
-
-      for (FileDescriptionEntity fileDescriptionEntity : fileDescriptionEntities) {
-        attachedFileDescriptions.add(new GenericFileDescription(
-            fileDescriptionEntity.getFilePath(), fileDescriptionEntity
-                .getFileName()));
-      }
-
-      return new PatchTarget(patchTargetDescription, attachedFileDescriptions);
-
     }
 
     return null;
