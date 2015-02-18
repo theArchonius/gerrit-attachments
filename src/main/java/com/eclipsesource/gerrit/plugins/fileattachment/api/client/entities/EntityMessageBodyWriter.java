@@ -48,7 +48,7 @@ public class EntityMessageBodyWriter<T> implements MessageBodyWriter<T> {
   @Override
   public boolean isWriteable(Class<?> type, Type genericType,
       Annotation[] annotations, MediaType mediaType) {
-    return mediaType.equals(MediaType.APPLICATION_JSON);
+    return mediaType.equals(MediaType.APPLICATION_JSON_TYPE);
   }
 
   /*
