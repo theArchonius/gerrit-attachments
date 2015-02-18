@@ -39,7 +39,7 @@ java_test(
     'src/test/java/com/eclipsesource/gerrit/plugins/fileattachment/api/test/**/*Test.java',
   ]),
   resources = glob(['src/test/resources/**/*']),
-  deps = [':api', ':junit', ':hamcrest', ':javax.ws.rs-api']
+  deps = [':api', ':junit', ':hamcrest', ':javax.ws.rs-api', ':gson']
 )
 
 # dependencies
