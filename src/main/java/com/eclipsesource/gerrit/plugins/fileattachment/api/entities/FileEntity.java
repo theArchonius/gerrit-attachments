@@ -176,8 +176,8 @@ public class FileEntity implements JsonEntity {
   @Override
   public String toString() {
     return "FileEntity [fileName=" + fileName + ", filePath=" + filePath
-        + ", contentType=" + contentType + ", content=" + content
-        + ", encodingMethod=" + encodingMethod + "]";
+        + ", contentType=" + contentType + ", content=" + content.length() + " characters - hash: "
+        + content.hashCode() + ", encodingMethod=" + encodingMethod + "]";
   }
 
 }

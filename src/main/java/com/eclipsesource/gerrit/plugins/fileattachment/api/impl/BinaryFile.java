@@ -156,7 +156,7 @@ public class BinaryFile implements File {
   public String toString() {
     return "BinaryFile [attachmentTarget=" + attachmentTarget
         + ", fileDescription=" + fileDescription + ", contentType="
-        + contentType + ", content=" + Arrays.toString(content) + "]";
+        + contentType + ", content=" + content.length + " bytes - hash: "+content.hashCode()+"] ]";
   }
 
 }

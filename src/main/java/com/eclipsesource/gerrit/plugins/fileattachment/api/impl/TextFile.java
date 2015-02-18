@@ -44,7 +44,8 @@ public class TextFile implements File {
    * @param fileDescription the file description, must not be null
    * @param contentType the content type, must not be null
    * @param content the content (encoded with the charset specified in the
-   *        content type - if none is specified, the default system charset is assumed)
+   *        content type - if none is specified, the default system charset is
+   *        assumed)
    * 
    * @throws IllegalArgumentException if the previously mentioned conditions are
    *         not met
@@ -53,7 +54,7 @@ public class TextFile implements File {
       String content) {
     this(fileDescription, contentType, content, null);
   }
-  
+
   /**
    * 
    * @param fileDescription the file description, must not be null
@@ -116,7 +117,9 @@ public class TextFile implements File {
     return content.getBytes(charset);
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -135,7 +138,9 @@ public class TextFile implements File {
     return result;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -159,14 +164,17 @@ public class TextFile implements File {
     return true;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
     return "TextFile [attachmentTarget=" + attachmentTarget
         + ", fileDescription=" + fileDescription + ", contentType="
-        + contentType + ", content=" + content + "]";
+        + contentType + ", content=" + content.length() + " characters - hash: "
+        + content.hashCode() + "]";
   }
 
 }
