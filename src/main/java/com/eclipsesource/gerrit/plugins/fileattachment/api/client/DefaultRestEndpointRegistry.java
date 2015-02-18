@@ -110,10 +110,10 @@ public class DefaultRestEndpointRegistry implements
       ChangeTargetDescription changeTargetDescription =
           patchSetTargetDescription.getChangeTargetDescription();
 
-      return new GenericRestEndpoint("a", "changes",
-          changeTargetDescription.getChangeId(), "revisions",
-          patchSetTargetDescription.getId() + "", "files",
-          patchTargetDescription.getPatchUrl(), endpointName);
+      return new GenericRestEndpoint("a").append("changes").appendEncoded(
+          changeTargetDescription.getChangeId()).append("revisions").appendEncoded(
+          patchSetTargetDescription.getId() + "").append("files").appendEncoded(
+          patchTargetDescription.getPatchUrl()).append(endpointName);
 
     }
     return null;

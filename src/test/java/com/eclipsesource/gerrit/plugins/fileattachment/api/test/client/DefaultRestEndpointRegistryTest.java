@@ -110,7 +110,7 @@ public class DefaultRestEndpointRegistryTest {
           assertThat(
               endpointRegistry.getRestEndpoint(patchTargetDescription,
                   FileAttachmentClientService.OPERATION_GET_TARGET).getPath(),
-              CoreMatchers.is(expectedPath + "fileattachment~file"));
+              CoreMatchers.is(expectedPath + FILE_ENDPOINT_NAME));
         }
       }
     }
