@@ -78,8 +78,10 @@ public class TextFileTest {
 
         // read the content
         try {
-          while (resourceReader.read(cBuffer, 0, cBuffer.length) != -1) {
-            resourceContent.append(cBuffer);
+          int readChars = resourceReader.read(cBuffer, 0, cBuffer.length);
+          while (readChars != -1) {
+            resourceContent.append(cBuffer, 0, readChars);
+            readChars = resourceReader.read(cBuffer, 0, cBuffer.length);
           }
         } catch (IOException e) {
           // we have to ensure that tests won't succeed if an IO error occurs
