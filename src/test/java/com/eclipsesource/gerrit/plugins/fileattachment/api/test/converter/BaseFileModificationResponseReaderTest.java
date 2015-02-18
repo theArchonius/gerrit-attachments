@@ -3,6 +3,7 @@
  */
 package com.eclipsesource.gerrit.plugins.fileattachment.api.test.converter;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -19,7 +20,6 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModifica
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity.ResultStatus;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.converter.BaseFileModificationResponseReader;
-import com.eclipsesource.gerrit.plugins.fileattachment.api.impl.GenericOperationResult;
 
 /**
  * @author Florian Zoubek
@@ -81,20 +81,25 @@ public class BaseFileModificationResponseReaderTest {
       for (FileState newFileState : FileState.values()) {
 
         OperationResultEntity operationResultEntity =
-            new OperationResultEntity(resultStatus, "");
+            new OperationResultEntity(resultStatus,
+                MESSAGES_MAP.get(resultStatus));
         FileModificationResponseEntity jsonEntity =
             new FileModificationResponseEntity(operationResultEntity,
                 newFileState);
 
-        OperationResult expectedOperationResult =
-            new GenericOperationResult(
-                RESULTSTATUS_TO_OPERATIONRESULTTYPE_MAP.get(resultStatus),
-                MESSAGES_MAP.get(resultStatus));
+        OperationResultType expectedOperationResultType =
+            RESULTSTATUS_TO_OPERATIONRESULTTYPE_MAP.get(resultStatus);
+        String expectedMessagePart = MESSAGES_MAP.get(resultStatus);
 
         OperationResult operationResult =
             baseFileModificationResponseReader.toObject(jsonEntity, null);
 
-        assertThat(operationResult, is(expectedOperationResult));
+        // check result type mapping
+        assertThat(operationResult.getResultType(),
+            is(expectedOperationResultType));
+        // check if the status message contains the message of the entity
+        assertThat(operationResult.getStatusMessage(),
+            containsString(expectedMessagePart));
 
       }
     }
