@@ -39,7 +39,7 @@ java_test(
     'src/test/java/com/eclipsesource/gerrit/plugins/fileattachment/api/test/**/*Test.java',
   ]),
   resources = glob(['src/test/resources/**/*']),
-  deps = [':api', ':junit', ':hamcrest', ':javax.ws.rs-api', ':gson', ':commons-codec']
+  deps = [':api', ':junit', ':hamcrest', ':javax.ws.rs-api', ':gson', ':commons-codec', ':mockito',':jersey-client']
 )
 
 # dependencies
@@ -85,4 +85,10 @@ maven_jar(
   name = 'hamcrest',
   id = 'org.hamcrest:hamcrest-all:1.3',
   license = 'BSDv3'
+)
+
+maven_jar(
+  name = 'mockito',
+  id = 'org.mockito:mockito-all:1.10.19',
+  license = 'MIT'
 )

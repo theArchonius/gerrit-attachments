@@ -110,6 +110,8 @@ public class RestFileAttachmentClientService implements
    * constructs a new {@link FileAttachmentClientService} instance
    * 
    * @param restRoot the root URI for all REST calls
+   * @param clientBuilder the builder used to obtain the rest client that is
+   *        used in this service
    * @param restEndpointRegistry the registry used to map
    *        {@link AttachmentTarget}s to {@link RestEndpoint}s. Passing null is
    *        not permitted.
@@ -128,11 +130,12 @@ public class RestFileAttachmentClientService implements
    */
   public RestFileAttachmentClientService(
       URI restRoot,
+      ClientBuilder clientBuilder,
       AttachmentTargetRestEndpointRegistry restEndpointRegistry,
       EntityReader<OperationResult, FileModificationResponseEntity, Object> operationResultReader,
       EntityReader<AttachmentTarget, AttachmentTargetResponseEntity, AttachmentTargetDescription> attachmentTargetResultReader,
-      EntityWriter<File, FileEntity, AttachmentTarget> fileEntityWriter, String username,
-      byte[] password) {
+      EntityWriter<File, FileEntity, AttachmentTarget> fileEntityWriter,
+      String username, byte[] password) {
 
     if (restRoot == null) {
       throw new IllegalArgumentException("A REST root URI must be specified");
@@ -160,7 +163,7 @@ public class RestFileAttachmentClientService implements
     }
     this.fileEntityWriter = fileEntityWriter;
 
-    this.clientBuilder = ClientBuilder.newBuilder();
+    this.clientBuilder = clientBuilder;
     clientBuilder.register(EntityMessageBodyWriter.class);
     clientBuilder.register(EntityMessageBodyReader.class);
   }
