@@ -370,16 +370,9 @@ public class RestFileAttachmentClientServiceTest {
   }
 
   /**
-   * Test method for
-   * {@link com.eclipsesource.gerrit.plugins.fileattachment.api.client.RestFileAttachmentClientService#attachFile(com.eclipsesource.gerrit.plugins.fileattachment.api.File, com.eclipsesource.gerrit.plugins.fileattachment.api.AttachmentTargetDescription)}
-   * .
-   * 
-   * @throws FileAttachmentClientException
-   * @throws ResponseException
-   * @throws RequestException
-   * @throws InvalidFileException
-   * @throws InvalidAttachmentTargetException
-   * @throws URISyntaxException
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * with valid parameters and no other errors occur
    */
   @Test
   public void testAttachFileSuccess() throws InvalidAttachmentTargetException,
@@ -415,6 +408,13 @@ public class RestFileAttachmentClientServiceTest {
 
   }
 
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * in case that the REST endpoint registry does not support that operation on
+   * the given target.
+   * 
+   */
   @Test
   public void testAttachFileWithUnsupportedOperation()
       throws InvalidAttachmentTargetException, InvalidFileException,
@@ -444,6 +444,12 @@ public class RestFileAttachmentClientServiceTest {
 
   }
 
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * in case that the attachment target is not supported.
+   * 
+   */
   @Test
   public void testAttachFileWithUnsupportedAttachmentTarget()
       throws InvalidAttachmentTargetException, InvalidFileException,
@@ -471,6 +477,13 @@ public class RestFileAttachmentClientServiceTest {
 
   }
 
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * in case that a {@link ProcessingException} is thrown during
+   * {@link WebTarget#request()}.
+   * 
+   */
   @Test
   public void testAttachFileWithProcessingExceptionFromRequest()
       throws InvalidAttachmentTargetException, InvalidFileException,
@@ -488,6 +501,13 @@ public class RestFileAttachmentClientServiceTest {
   }
 
 
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * in case that a {@link ResponseProcessingException} is thrown during
+   * {@link WebTarget#request()}.
+   * 
+   */
   @Test
   public void testAttachFileWithResponseProcessingExceptionFromRequest()
       throws InvalidAttachmentTargetException, InvalidFileException,
@@ -504,7 +524,13 @@ public class RestFileAttachmentClientServiceTest {
     serviceUnderTest.attachFile(file, patchTargetDescription);
 
   }
-  
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * in case that {@link Builder#put(Entity)} returns null
+   * 
+   */
   @Test
   public void testAttachFileWithNullFromPut()
       throws InvalidAttachmentTargetException, InvalidFileException,
@@ -520,7 +546,13 @@ public class RestFileAttachmentClientServiceTest {
     serviceUnderTest.attachFile(file, patchTargetDescription);
 
   }
-  
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * in case that the response from the server has no entities
+   * 
+   */
   @Test
   public void testAttachFileWithEmptyResponse()
       throws InvalidAttachmentTargetException, InvalidFileException,
@@ -537,6 +569,14 @@ public class RestFileAttachmentClientServiceTest {
 
   }
 
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * in case that a {@link ProcessingException} is thrown during
+   * {@link Response#readEntity(Class)}.
+   * 
+   */
   @Test
   public void testAttachFileWithProcessingExceptionFromReadEntity()
       throws InvalidAttachmentTargetException, InvalidFileException,
@@ -555,6 +595,13 @@ public class RestFileAttachmentClientServiceTest {
 
   }
 
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
+   * in case that {@link Response#readEntity(Class)} returns null
+   * 
+   */
   @Test
   public void testAttachFileWhenNullFromToObject()
       throws InvalidAttachmentTargetException, InvalidFileException,
