@@ -232,8 +232,8 @@ public class RestFileAttachmentClientService implements
       throw new ResponseException(
           "Internal error: An error occured during response processing.", rpe);
     } catch (ProcessingException pe) {
-      throw new ResponseException(
-          "Internal error: An error occured during response processing.", pe);
+      throw new RequestException(
+          "Internal error: An error occured during request processing.", pe);
     }
 
     OperationResult result = null;
