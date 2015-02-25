@@ -9,11 +9,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
@@ -57,11 +60,14 @@ import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.Ope
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.RequestException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.ResponseException;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.client.exceptions.UnsupportedFileOperationException;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetResponseEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityReader;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.EntityWriter;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileDescriptionEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModificationResponseEntity;
+import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.AttachmentTargetEntity.TargetType;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.FileModificationResponseEntity.FileState;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity;
 import com.eclipsesource.gerrit.plugins.fileattachment.api.entities.OperationResultEntity.ResultStatus;
@@ -123,7 +129,7 @@ public class RestFileAttachmentClientServiceTest {
    * default mock attachment target result reader for the REST service
    */
   @Mock
-  EntityReader<AttachmentTarget, AttachmentTargetResponseEntity, AttachmentTargetDescription> attachmentTargetResultReader;
+  EntityReader<AttachmentTarget, AttachmentTargetResponseEntity, AttachmentTargetDescription> attachmentTargetResponseReader;
 
   /**
    * default mock file entity writer
@@ -176,6 +182,27 @@ public class RestFileAttachmentClientServiceTest {
    */
   @Mock
   FileEntity fileEntity;
+
+  /**
+   * default mock for {@link AttachmentTargetResponseEntity}
+   */
+  @Mock
+  AttachmentTargetResponseEntity attachmentTargetResponseEntity;
+
+  /**
+   * default mock for {@link AttachmentTargetEntity}
+   */
+  @Mock
+  AttachmentTargetEntity attachmentTargetEntity;
+
+  // AttachmentTarget mocks
+  // =========================
+
+  /**
+   * default mock for attachmentTarget
+   */
+  @Mock
+  AttachmentTarget attachmentTarget;
 
   // TargetDescription mocks
   // =========================
@@ -256,6 +283,26 @@ public class RestFileAttachmentClientServiceTest {
    */
   byte[] password = "test".getBytes();
 
+  /**
+   * number of file description mocks to generate
+   * 
+   * @see #fileDescriptions
+   */
+  int numFileDescriptions = 4;
+
+  /**
+   * list of file descriptions used by the default {@link #attachmentTarget}
+   * mock
+   */
+  List<FileDescription> fileDescriptions;
+
+  /**
+   * array of file descriptions used by the default
+   * {@link #attachmentTargetEntity}. This array contains the corresponding
+   * entities of {@link #fileDescriptions}.
+   */
+  FileDescriptionEntity[] fileDescriptionEntities;
+
 
   // fixture
 
@@ -263,6 +310,7 @@ public class RestFileAttachmentClientServiceTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
+
 
   @Before
   public void setUp() throws URISyntaxException,
@@ -274,6 +322,24 @@ public class RestFileAttachmentClientServiceTest {
      * exceptions. The response mock is the only one that is not initialized, as
      * it varies for all tests.
      */
+
+    fileDescriptions = new ArrayList<FileDescription>(numFileDescriptions);
+    fileDescriptionEntities = new FileDescriptionEntity[numFileDescriptions];
+    for (int i = 0; i < numFileDescriptions; i++) {
+
+      FileDescription fileDescription = mock(FileDescription.class);
+      when(fileDescription.getServerFileName()).thenReturn(
+          "list-" + i + "-" + serverFileName);
+      when(fileDescription.getServerFilePath()).thenReturn(
+          serverFilePath + "list-" + i + "/");
+
+      FileDescriptionEntity fileDescriptionEntity =
+          mock(FileDescriptionEntity.class);
+      when(fileDescriptionEntity.getFileName()).thenReturn(
+          "list-" + i + "-" + serverFileName);
+      when(fileDescriptionEntity.getFilePath()).thenReturn(
+          serverFilePath + "list-" + i + "/");
+    }
 
     // restEndpointRegistry
     when(
@@ -327,6 +393,19 @@ public class RestFileAttachmentClientServiceTest {
         fileEntityWriter.toEntity(any(File.class), any(AttachmentTarget.class)))
         .thenReturn(fileEntity);
 
+    // attachmentTargetResultReader
+    when(
+        attachmentTargetResponseReader.toObject(
+            any(AttachmentTargetResponseEntity.class),
+            any(AttachmentTargetDescription.class))).thenReturn(
+        attachmentTarget);
+
+    // attachmentTarget
+    when(attachmentTarget.getAttachedFileDescriptions()).thenReturn(
+        fileDescriptions);
+    when(attachmentTarget.getTargetDescription()).thenReturn(
+        patchTargetDescription);
+
     // fileEntity
     when(fileEntity.getContent()).thenReturn(
         Base64.encodeBase64String(fileContent));
@@ -339,6 +418,9 @@ public class RestFileAttachmentClientServiceTest {
 
     // builder
     when(builder.put(any(Entity.class))).thenReturn(response);
+    when(builder.get()).thenReturn(response);
+    when(builder.delete()).thenReturn(response);
+    when(builder.post(any(Entity.class))).thenReturn(response);
 
 
     // operationResultEntity
@@ -351,6 +433,17 @@ public class RestFileAttachmentClientServiceTest {
         FileState.NEW);
     when(fileModificationResponseEntity.getOperationResult()).thenReturn(
         operationResultEntity);
+
+    // attachmentTargetResponseEntity
+    when(attachmentTargetResponseEntity.getOperationResultEntity()).thenReturn(
+        operationResultEntity);
+    when(attachmentTargetResponseEntity.getAttachmentTargetEntity())
+        .thenReturn(attachmentTargetEntity);
+
+    // attachmentTargetEntity
+    when(attachmentTargetEntity.getTargetType()).thenReturn(TargetType.PATCH);
+    when(attachmentTargetEntity.getFileDescriptions()).thenReturn(
+        fileDescriptionEntities);
 
     // operationResultReader
     when(
@@ -366,13 +459,19 @@ public class RestFileAttachmentClientServiceTest {
     serviceUnderTest =
         new RestFileAttachmentClientService(new URI(restRoot), clientBuilder,
             restEndpointRegistry, operationResultReader,
-            attachmentTargetResultReader, fileEntityWriter, user, password);
+            attachmentTargetResponseReader, fileEntityWriter, user, password);
   }
+
+  /*
+   * ====================================================
+   * RestFileAttachmentClientService#attachFile() tests
+   * ====================================================
+   */
 
   /**
    * Tests
    * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
-   * with valid parameters and no other errors occur
+   * with valid parameters and no other errors occur.
    */
   @Test
   public void testAttachFileSuccess() throws InvalidAttachmentTargetException,
@@ -457,9 +556,8 @@ public class RestFileAttachmentClientServiceTest {
 
     // expected exception
     thrown.expect(InvalidAttachmentTargetException.class);
-    thrown.expectMessage(allOf(
-        containsString("does not support the operation"),
-        containsString("OPERATION_ATTACH_FILE")));
+    thrown
+        .expectMessage(containsString("does not support AttachmentTargetDescriptions"));
 
     // prepare mocks
 
@@ -468,9 +566,8 @@ public class RestFileAttachmentClientServiceTest {
             anyString())).thenReturn(null);
     when(
         restEndpointRegistry.getRestEndpoint(
-            any(AttachmentTargetDescription.class), anyString())).thenThrow(
-        new UnsupportedFileOperationException(
-            FileAttachmentClientService.OPERATION_ATTACH_FILE));
+            any(AttachmentTargetDescription.class), anyString())).thenReturn(
+        null);
 
     // perform operation
     serviceUnderTest.attachFile(file, patchTargetDescription);
@@ -481,11 +578,11 @@ public class RestFileAttachmentClientServiceTest {
    * Tests
    * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
    * in case that a {@link ProcessingException} is thrown during
-   * {@link WebTarget#request()}.
+   * {@link Builder#put(Entity)}.
    * 
    */
   @Test
-  public void testAttachFileWithProcessingExceptionFromRequest()
+  public void testAttachFileWithProcessingExceptionFromPut()
       throws InvalidAttachmentTargetException, InvalidFileException,
       RequestException, ResponseException, FileAttachmentClientException {
 
@@ -505,11 +602,11 @@ public class RestFileAttachmentClientServiceTest {
    * Tests
    * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
    * in case that a {@link ResponseProcessingException} is thrown during
-   * {@link WebTarget#request()}.
+   * {@link Builder#put(Entity)}.
    * 
    */
   @Test
-  public void testAttachFileWithResponseProcessingExceptionFromRequest()
+  public void testAttachFileWithResponseProcessingExceptionFromPut()
       throws InvalidAttachmentTargetException, InvalidFileException,
       RequestException, ResponseException, FileAttachmentClientException {
 
@@ -528,7 +625,7 @@ public class RestFileAttachmentClientServiceTest {
   /**
    * Tests
    * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
-   * in case that {@link Builder#put(Entity)} returns null
+   * in case that {@link Builder#put(Entity)} returns null.
    * 
    */
   @Test
@@ -550,7 +647,7 @@ public class RestFileAttachmentClientServiceTest {
   /**
    * Tests
    * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
-   * in case that the response from the server has no entities
+   * in case that the response from the server has no entities.
    * 
    */
   @Test
@@ -599,7 +696,7 @@ public class RestFileAttachmentClientServiceTest {
   /**
    * Tests
    * {@link RestFileAttachmentClientService#attachFile(File, AttachmentTargetDescription)}
-   * in case that {@link Response#readEntity(Class)} returns null
+   * in case that {@link Response#readEntity(Class)} returns null.
    * 
    */
   @Test
@@ -623,4 +720,259 @@ public class RestFileAttachmentClientServiceTest {
 
   }
 
+  /*
+   * =============================================================
+   * RestFileAttachmentClientService#getAttachmentTarget() tests
+   * =============================================================
+   */
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * with valid parameters and no other errors occur.
+   */
+  @Test
+  public void testGetAttachmentTargetSuccess() throws RequestException,
+      ResponseException, FileAttachmentClientException, URISyntaxException {
+
+    // prepare mocks
+    when(response.hasEntity()).thenReturn(true);
+    when(response.readEntity(AttachmentTargetResponseEntity.class)).thenReturn(
+        attachmentTargetResponseEntity);
+
+    // perform operation
+    AttachmentTarget attachmentTarget =
+        serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+    assertThat(attachmentTarget.getAttachedFileDescriptions(),
+        is(fileDescriptions));
+    assertThat(attachmentTarget.getTargetDescription(),
+        is((AttachmentTargetDescription) patchTargetDescription));
+
+    // check behaviour
+    InOrder inOrder = Mockito.inOrder(client, webTarget, builder, response);
+    inOrder.verify(client).register(any(HttpAuthenticationFeature.class));
+    inOrder.verify(client).target(new URI(restRoot));
+    inOrder.verify(webTarget).path(Matchers.argThat(is(restEndpointPath)));
+    inOrder.verify(webTarget).request();
+    inOrder.verify(builder).get();
+    inOrder.verify(response).readEntity(AttachmentTargetResponseEntity.class);
+
+    verify(restEndpointRegistry).getRestEndpoint(patchTargetDescription,
+        FileAttachmentClientService.OPERATION_GET_TARGET);
+    verify(restEndpoint).getPath();
+  }
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * in case that the REST endpoint registry does not support that operation on
+   * the given target.
+   * 
+   */
+  @Test
+  public void testGetAttachmentTargetWithUnsupportedOperation()
+      throws InvalidAttachmentTargetException, InvalidFileException,
+      RequestException, ResponseException, FileAttachmentClientException {
+
+    // expected exception
+    thrown.expect(InvalidAttachmentTargetException.class);
+    thrown.expectMessage(allOf(
+        containsString("does not support the operation"),
+        containsString("OPERATION_GET_TARGET")));
+
+    // prepare mocks
+
+    when(
+        restEndpointRegistry.getRestEndpoint(any(AttachmentTarget.class),
+            anyString())).thenThrow(
+        new UnsupportedFileOperationException(
+            FileAttachmentClientService.OPERATION_GET_TARGET));
+    when(
+        restEndpointRegistry.getRestEndpoint(
+            any(AttachmentTargetDescription.class), anyString())).thenThrow(
+        new UnsupportedFileOperationException(
+            FileAttachmentClientService.OPERATION_GET_TARGET));
+
+    // perform operation
+    serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+  }
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * in case that the attachment target is not supported.
+   * 
+   */
+  @Test
+  public void testGetAttachmentTargetWithUnsupportedAttachmentTarget()
+      throws InvalidAttachmentTargetException, InvalidFileException,
+      RequestException, ResponseException, FileAttachmentClientException {
+
+    // expected exception
+    thrown.expect(InvalidAttachmentTargetException.class);
+    thrown
+        .expectMessage(containsString("does not support AttachmentTargetDescriptions"));
+
+    // prepare mocks
+
+    when(
+        restEndpointRegistry.getRestEndpoint(any(AttachmentTarget.class),
+            anyString())).thenReturn(null);
+    when(
+        restEndpointRegistry.getRestEndpoint(
+            any(AttachmentTargetDescription.class), anyString())).thenReturn(
+        null);
+
+    // perform operation
+    serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+  }
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * in case that a {@link ProcessingException} is thrown during
+   * {@link Builder#get()}.
+   * 
+   */
+  @Test
+  public void testGetAttachmentTargetWithProcessingExceptionFromGet()
+      throws InvalidAttachmentTargetException, InvalidFileException,
+      RequestException, ResponseException, FileAttachmentClientException {
+
+    // expected exception
+    thrown.expect(RequestException.class);
+
+    // prepare mocks
+    when(webTarget.request()).thenThrow(new ProcessingException(""));
+
+    // perform operation
+    serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+  }
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * in case that {@link Builder#get()} returns null.
+   * 
+   */
+  @Test
+  public void testGetAttachmentTargetWithNullFromGet()
+      throws InvalidAttachmentTargetException, InvalidFileException,
+      RequestException, ResponseException, FileAttachmentClientException {
+
+    // expected exception
+    thrown.expect(ResponseException.class);
+
+    // prepare mocks
+    when(builder.get()).thenReturn(null);
+
+    // perform operation
+    serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+  }
+
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * in case that the response from the server has no entities.
+   * 
+   */
+  @Test
+  public void testGetAttachmentTargetWithEmptyResponse()
+      throws InvalidAttachmentTargetException, InvalidFileException,
+      RequestException, ResponseException, FileAttachmentClientException {
+
+    // expected exception
+    thrown.expect(OperationFailedException.class);
+
+    // prepare mocks
+    when(response.hasEntity()).thenReturn(false);
+
+    // perform operation
+    serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+  }
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * in case that {@link Response#readEntity(Class)} returns null.
+   * 
+   */
+  @Test
+  public void testGetAttachmentTargetWhenNullFromToObject()
+      throws InvalidAttachmentTargetException, InvalidFileException,
+      RequestException, ResponseException, FileAttachmentClientException {
+
+    // expected exception
+    thrown.expect(ResponseException.class);
+
+    // prepare mocks
+    when(response.hasEntity()).thenReturn(true);
+    when(response.readEntity(AttachmentTargetResponseEntity.class)).thenReturn(
+        attachmentTargetResponseEntity);
+    when(
+        attachmentTargetResponseReader.toObject(
+            any(AttachmentTargetResponseEntity.class),
+            any(AttachmentTargetDescription.class))).thenReturn(null);
+
+    // perform operation
+    serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+  }
+
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * with valid parameters but the response contains a operation result status
+   * of {@link ResultStatus#FAILED}.
+   */
+  @Test
+  public void testGetAttachmentTargetWithResultFailed()
+      throws RequestException, ResponseException,
+      FileAttachmentClientException, URISyntaxException {
+
+    // expected exception
+    thrown.expect(OperationFailedException.class);
+
+    // prepare mocks
+    when(response.hasEntity()).thenReturn(true);
+    when(response.readEntity(AttachmentTargetResponseEntity.class)).thenReturn(
+        attachmentTargetResponseEntity);
+    when(operationResultEntity.getResultStatus()).thenReturn(ResultStatus.FAILED);
+
+    // perform operation
+    serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+  }
+  
+  /**
+   * Tests
+   * {@link RestFileAttachmentClientService#getAttachmentTarget(AttachmentTargetDescription)}
+   * with valid parameters but the response contains a operation result status
+   * of {@link ResultStatus#NOTPERMITTED}.
+   */
+  @Test
+  public void testGetAttachmentTargetWithResultNotPermitted()
+      throws RequestException, ResponseException,
+      FileAttachmentClientException, URISyntaxException {
+
+    // expected exception
+    thrown.expect(OperationFailedException.class);
+
+    // prepare mocks
+    when(response.hasEntity()).thenReturn(true);
+    when(response.readEntity(AttachmentTargetResponseEntity.class)).thenReturn(
+        attachmentTargetResponseEntity);
+    when(operationResultEntity.getResultStatus()).thenReturn(ResultStatus.NOTPERMITTED);
+
+    // perform operation
+    serviceUnderTest.getAttachmentTarget(patchTargetDescription);
+
+  }
 }
