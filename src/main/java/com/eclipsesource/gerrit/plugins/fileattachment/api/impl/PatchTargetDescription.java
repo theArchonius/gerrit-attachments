@@ -54,5 +54,54 @@ public class PatchTargetDescription implements AttachmentTargetDescription {
     this.patchUrl = patchUrl;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result =
+        prime
+            * result
+            + ((patchSetTargetDescription == null) ? 0
+                : patchSetTargetDescription.hashCode());
+    result = prime * result + ((patchUrl == null) ? 0 : patchUrl.hashCode());
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    PatchTargetDescription other = (PatchTargetDescription) obj;
+    if (patchSetTargetDescription == null) {
+      if (other.patchSetTargetDescription != null) return false;
+    } else if (!patchSetTargetDescription
+        .equals(other.patchSetTargetDescription)) return false;
+    if (patchUrl == null) {
+      if (other.patchUrl != null) return false;
+    } else if (!patchUrl.equals(other.patchUrl)) return false;
+    return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "PatchTargetDescription [patchSetTargetDescription="
+        + patchSetTargetDescription + ", patchUrl=" + patchUrl + "]";
+  }
 
 }

@@ -72,6 +72,50 @@ public class FileModificationResponseEntity implements JsonEntity {
     this.newFileState = newFileState;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result =
+        prime * result + ((newFileState == null) ? 0 : newFileState.hashCode());
+    result =
+        prime * result
+            + ((operationResult == null) ? 0 : operationResult.hashCode());
+    return result;
+  }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    FileModificationResponseEntity other = (FileModificationResponseEntity) obj;
+    if (newFileState != other.newFileState) return false;
+    if (operationResult == null) {
+      if (other.operationResult != null) return false;
+    } else if (!operationResult.equals(other.operationResult)) return false;
+    return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "FileModificationResponseEntity [operationResult=" + operationResult
+        + ", newFileState=" + newFileState + "]";
+  }
 
 }

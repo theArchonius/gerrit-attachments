@@ -63,4 +63,59 @@ public class PatchTarget implements AttachmentTarget {
     return attachedFileDescriptions;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result =
+        prime
+            * result
+            + ((attachedFileDescriptions == null) ? 0
+                : attachedFileDescriptions.hashCode());
+    result =
+        prime
+            * result
+            + ((patchTargetDescription == null) ? 0 : patchTargetDescription
+                .hashCode());
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    PatchTarget other = (PatchTarget) obj;
+    if (attachedFileDescriptions == null) {
+      if (other.attachedFileDescriptions != null) return false;
+    } else if (!attachedFileDescriptions.equals(other.attachedFileDescriptions))
+      return false;
+    if (patchTargetDescription == null) {
+      if (other.patchTargetDescription != null) return false;
+    } else if (!patchTargetDescription.equals(other.patchTargetDescription))
+      return false;
+    return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "PatchTarget [patchTargetDescription=" + patchTargetDescription
+        + ", attachedFileDescriptions=" + attachedFileDescriptions + "]";
+  }
+
 }

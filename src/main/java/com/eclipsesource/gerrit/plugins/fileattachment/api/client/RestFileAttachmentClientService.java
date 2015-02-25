@@ -70,7 +70,7 @@ public class RestFileAttachmentClientService implements
    * the entity reader used to convert {@link FileModificationResponseEntity}
    * instances to {@link OperationResult}s
    */
-  private EntityReader<OperationResult, FileModificationResponseEntity, Object> fileModificationResponseEntityReader;
+  private EntityReader<OperationResult, FileModificationResponseEntity, Object> fileModificationResponseReader;
 
   /**
    * the entity reader used to convert {@link AttachmentTargetResponseEntity}
@@ -110,13 +110,15 @@ public class RestFileAttachmentClientService implements
    * constructs a new {@link FileAttachmentClientService} instance
    * 
    * @param restRoot the root URI for all REST calls
+   * @param clientBuilder the builder used to obtain the rest client that is
+   *        used in this service
    * @param restEndpointRegistry the registry used to map
    *        {@link AttachmentTarget}s to {@link RestEndpoint}s. Passing null is
    *        not permitted.
-   * @param operationResultReader the {@link OperationResult} reader that is
+   * @param fileModificationResponseReader the entity reader that is
    *        used to convert {@link FileModificationResponseEntity}s to
    *        {@link OperationResult}s
-   * @param attachmentTargetResultReader the entity reader used to convert
+   * @param attachmentTargetResponseReader the entity reader used to convert
    *        {@link AttachmentTargetEntity} instances to {@link AttachmentTarget}
    *        s
    * @param fileEntityWriter the {@link FileEntity} writer used to convert
@@ -128,11 +130,12 @@ public class RestFileAttachmentClientService implements
    */
   public RestFileAttachmentClientService(
       URI restRoot,
+      ClientBuilder clientBuilder,
       AttachmentTargetRestEndpointRegistry restEndpointRegistry,
-      EntityReader<OperationResult, FileModificationResponseEntity, Object> operationResultReader,
-      EntityReader<AttachmentTarget, AttachmentTargetResponseEntity, AttachmentTargetDescription> attachmentTargetResultReader,
-      EntityWriter<File, FileEntity, AttachmentTarget> fileEntityWriter, String username,
-      byte[] password) {
+      EntityReader<OperationResult, FileModificationResponseEntity, Object> fileModificationResponseReader,
+      EntityReader<AttachmentTarget, AttachmentTargetResponseEntity, AttachmentTargetDescription> attachmentTargetResponseReader,
+      EntityWriter<File, FileEntity, AttachmentTarget> fileEntityWriter,
+      String username, byte[] password) {
 
     if (restRoot == null) {
       throw new IllegalArgumentException("A REST root URI must be specified");
@@ -148,19 +151,25 @@ public class RestFileAttachmentClientService implements
     this.username = username;
     this.password = password;
 
-    if (operationResultReader == null) {
+    if (fileModificationResponseReader == null) {
       throw new IllegalArgumentException(
-          "An operation result reader must be specfied");
+          "An file modification response reader must be specfied");
     }
-    this.fileModificationResponseEntityReader = operationResultReader;
+    this.fileModificationResponseReader = fileModificationResponseReader;
 
     if (fileEntityWriter == null) {
       throw new IllegalArgumentException(
-          "A file entity wirter must be specfied");
+          "A file entity writer must be specfied");
     }
     this.fileEntityWriter = fileEntityWriter;
 
-    this.clientBuilder = ClientBuilder.newBuilder();
+    if (attachmentTargetResponseReader == null) {
+      throw new IllegalArgumentException(
+          "A attachment target response reader must be specified");
+    }
+    this.attachmentTargetResponseReader = attachmentTargetResponseReader;
+
+    this.clientBuilder = clientBuilder;
     clientBuilder.register(EntityMessageBodyWriter.class);
     clientBuilder.register(EntityMessageBodyReader.class);
   }
@@ -229,8 +238,8 @@ public class RestFileAttachmentClientService implements
       throw new ResponseException(
           "Internal error: An error occured during response processing.", rpe);
     } catch (ProcessingException pe) {
-      throw new ResponseException(
-          "Internal error: An error occured during response processing.", pe);
+      throw new RequestException(
+          "Internal error: An error occured during request processing.", pe);
     }
 
     OperationResult result = null;
@@ -243,7 +252,7 @@ public class RestFileAttachmentClientService implements
         try {
           FileModificationResponseEntity entity =
               response.readEntity(FileModificationResponseEntity.class);
-          result = fileModificationResponseEntityReader.toObject(entity, null);
+          result = fileModificationResponseReader.toObject(entity, null);
 
           if (result == null) {
             // the response reader was not able to create a proper attachment
@@ -330,7 +339,7 @@ public class RestFileAttachmentClientService implements
       // start the request
       response = attachmentWebTarget.request().get();
     } catch (ProcessingException pe) {
-      throw new ResponseException(
+      throw new RequestException(
           "Internal error: An error occured during response processing.", pe);
     }
 

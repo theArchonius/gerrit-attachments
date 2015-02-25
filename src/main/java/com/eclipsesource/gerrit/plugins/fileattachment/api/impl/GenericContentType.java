@@ -9,8 +9,6 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.eclipsesource.gerrit.plugins.fileattachment.api.ContentType;
 
@@ -178,7 +176,7 @@ public class GenericContentType implements ContentType {
    *        value
    */
   public GenericContentType(String contentTypeIdentifier) {
-    this(contentTypeIdentifier, !contentTypeIdentifier.startsWith("txt"));
+    this(contentTypeIdentifier, !contentTypeIdentifier.trim().startsWith("text"));
   }
 
   /**
@@ -192,22 +190,27 @@ public class GenericContentType implements ContentType {
   public GenericContentType(String contentTypeIdentifier, boolean binary) {
 
     // extract the type, subtype and parameter strings
-    Pattern basePattern = Pattern.compile("(.*)/(.*);?(.*)");
-    Matcher basePatternMatcher = basePattern.matcher(contentTypeIdentifier);
-
-    if (!basePatternMatcher.matches()) {
+    int typeDelimiterPos = contentTypeIdentifier.indexOf('/');
+    if (typeDelimiterPos < 0) {
       throw new IllegalArgumentException(
           MessageFormat
               .format(
-                  "Could not parse content type value - the content type value is invalid {0}",
+                  "Could not parse content type value - could not find type delimiter \"/\" in identifier \"{0}\"",
                   contentTypeIdentifier));
     }
 
-    type = basePatternMatcher.group(1);
-    subtype = basePatternMatcher.group(2);
-    String parameterString = basePatternMatcher.group(3);
+    type = contentTypeIdentifier.substring(0, typeDelimiterPos);
+    subtype = contentTypeIdentifier.substring(typeDelimiterPos + 1);
 
-    parseParameters(parameterString, this.parameters);
+    int parameterDelimiterPos = subtype.indexOf(';');
+    if (parameterDelimiterPos >= 0) {
+      String parameterString = subtype.substring(parameterDelimiterPos + 1);
+      subtype = subtype.substring(0, parameterDelimiterPos);
+
+      parseParameters(parameterString, this.parameters);
+    }
+
+
     this.binary = binary;
 
   }
@@ -221,7 +224,8 @@ public class GenericContentType implements ContentType {
    * @param map the map to write the parameters to, existing parameters will be
    *        overriden
    */
-  private static void parseParameters(String parameterString, Map<String, String> map) {
+  private static void parseParameters(String parameterString,
+      Map<String, String> map) {
     // parse parameter string to extract the parameters and their values
     // simple splitting is not possible as separator chars in quoted strings
     // should be ignored
@@ -254,6 +258,11 @@ public class GenericContentType implements ContentType {
       } else if (currentChar == '"') {
         // we pass an quotation mark, update state accordingly
         isQuoted = !isQuoted;
+        if (isParam) {
+          sbName.append(currentChar);
+        } else {
+          sbValue.append(currentChar);
+        }
 
       } else if (isParam) {
         // character is part of the parameter name
@@ -268,7 +277,7 @@ public class GenericContentType implements ContentType {
     // the last parameter value does not need to be marked with a special
     // character, so add the last parameter name and value if it exists
     if (sbName.length() > 0) {
-      map.put(sbName.toString(), sbValue.toString());
+      map.put(sbName.toString().trim(), sbValue.toString().trim());
     }
   }
 
@@ -301,6 +310,58 @@ public class GenericContentType implements ContentType {
   @Override
   public boolean isBinary() {
     return binary;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (binary ? 1231 : 1237);
+    result =
+        prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+    result = prime * result + ((subtype == null) ? 0 : subtype.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    GenericContentType other = (GenericContentType) obj;
+    if (binary != other.binary) return false;
+    if (parameters == null) {
+      if (other.parameters != null) return false;
+    } else if (!parameters.equals(other.parameters)) return false;
+    if (subtype == null) {
+      if (other.subtype != null) return false;
+    } else if (!subtype.equals(other.subtype)) return false;
+    if (type == null) {
+      if (other.type != null) return false;
+    } else if (!type.equals(other.type)) return false;
+    return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "GenericContentType [type=" + type + ", subtype=" + subtype
+        + ", binary=" + binary + ", parameters=" + parameters + "]";
   }
 
 }

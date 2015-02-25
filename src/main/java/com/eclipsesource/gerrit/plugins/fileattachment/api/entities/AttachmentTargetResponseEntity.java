@@ -71,6 +71,60 @@ public class AttachmentTargetResponseEntity implements JsonEntity {
     this.operationResultEntity = operationResultEntity;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result =
+        prime
+            * result
+            + ((attachmentTargetEntity == null) ? 0 : attachmentTargetEntity
+                .hashCode());
+    result =
+        prime
+            * result
+            + ((operationResultEntity == null) ? 0 : operationResultEntity
+                .hashCode());
+    return result;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    AttachmentTargetResponseEntity other = (AttachmentTargetResponseEntity) obj;
+    if (attachmentTargetEntity == null) {
+      if (other.attachmentTargetEntity != null) return false;
+    } else if (!attachmentTargetEntity.equals(other.attachmentTargetEntity))
+      return false;
+    if (operationResultEntity == null) {
+      if (other.operationResultEntity != null) return false;
+    } else if (!operationResultEntity.equals(other.operationResultEntity))
+      return false;
+    return true;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "AttachmentTargetResponseEntity [attachmentTargetEntity="
+        + attachmentTargetEntity + ", operationResultEntity="
+        + operationResultEntity + "]";
+  }
+
 
 
 }
